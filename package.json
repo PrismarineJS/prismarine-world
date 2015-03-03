@@ -26,5 +26,8 @@
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-babel": "^4.0.0"
+  },
+  "dependencies": {
+    "prismarine-chunk": "0.0.1"
   }
 }
