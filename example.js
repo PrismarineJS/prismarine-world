@@ -17,8 +17,9 @@ for(var chunkX=-1;chunkX<2;chunkX++)
         }
       }
     }
-    world.setColumn(chunkX,chunkZ,chunk);
+    world.setColumnSync(chunkX,chunkZ,chunk);
   }
 }
-
-console.log(JSON.stringify(world.getBlock(new Vec3(3,50,3)),null,2));
+world.getBlock(new Vec3(3,50,3)).then(function(block){
+    console.log(JSON.stringify(block,null,2));
+});

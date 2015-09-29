@@ -17,14 +17,23 @@ class World {
     this.columns = {};
     this.columnsArray = [];
   }
-
   
-  getColumn(chunkX, chunkZ) {
+  getColumnSync(chunkX, chunkZ) {
     var key = columnKeyXZ(chunkX, chunkZ);
     return this.columns[key];
   };
 
-  setColumn(chunkX,chunkZ,chunk) {
+  async getColumn(chunkX, chunkZ) {
+    await Promise.resolve();
+    return this.getColumnSync(chunkX, chunkZ);
+  };
+
+  async setColumn(chunkX,chunkZ,chunk) {
+    await Promise.resolve();
+    this.setColumnSync(chunkX,chunkZ,chunk);
+  };
+
+  setColumnSync(chunkX,chunkZ,chunk) {
     var key=columnKeyXZ(chunkX,chunkZ);
     this.columnsArray.push({chunkX:chunkX,chunkZ:chunkZ,column:chunk});
     this.columns[key]=chunk;
@@ -34,59 +43,113 @@ class World {
     return this.columnsArray;
   };
 
-  getColumnAt(pos) {
+  getColumnAtSync(pos) {
+    var chunkX=Math.floor(pos.x/16);
+    var chunkZ=Math.floor(pos.z/16);
+    return this.getColumnSync(chunkX,chunkZ);
+  };
+
+  async getColumnAt(pos) {
     var chunkX=Math.floor(pos.x/16);
     var chunkZ=Math.floor(pos.z/16);
     return this.getColumn(chunkX,chunkZ);
   };
 
-  setBlock(pos,block) {
-    this.getColumnAt(pos).setBlock(posInChunk(pos),block);
+  setBlockSync(pos,block) {
+    this.getColumnAtSync(pos).setBlock(posInChunk(pos),block);
   };
 
-  getBlock(pos)
-  {
-    return this.getColumnAt(pos).getBlock(posInChunk(pos));
+  async setBlock(pos,block) {
+    (await this.getColumnAt(pos)).setBlock(posInChunk(pos),block);
   };
 
-  getBlockType(pos) {
-    return this.getColumnAt(pos).getBlockType(posInChunk(pos));
+  getBlockSync(pos)  {
+    return this.getColumnAtSync(pos).getBlock(posInChunk(pos));
   };
 
-  getBlockData(pos) {
-    return this.getColumnAt(pos).getBlockData(posInChunk(pos));
+  getBlockTypeSync(pos) {
+    return this.getColumnAtSync(pos).getBlockType(posInChunk(pos));
   };
 
-  getBlockLight(pos) {
-    return this.getColumnAt(pos).getBlockLight(posInChunk(pos));
+  getBlockDataSync(pos) {
+    return this.getColumnAtSync(pos).getBlockData(posInChunk(pos));
   };
 
-  getSkyLight(pos) {
-    return this.getColumnAt(pos).getSkyLight(posInChunk(pos));
+  getBlockLightSync(pos) {
+    return this.getColumnAtSync(pos).getBlockLight(posInChunk(pos));
   };
 
-  getBiome(pos) {
-    return this.getColumnAt(pos).getBiome(posInChunk(pos));
+  getSkyLightSync(pos) {
+    return this.getColumnAtSync(pos).getSkyLight(posInChunk(pos));
   };
 
-  setBlockType(pos,blockType) {
-    this.getColumnAt(pos).setBlockType(posInChunk(pos),blockType);
+  getBiomeSync(pos) {
+    return this.getColumnAtSync(pos).getBiome(posInChunk(pos));
   };
 
-  setBlockData(pos, data) {
-    this.getColumnAt(pos).setBlockData(posInChunk(pos),data);
+  async getBlock(pos)  {
+    return (await this.getColumnAt(pos)).getBlock(posInChunk(pos));
   };
 
-  setBlockLight(pos, light) {
-    this.getColumnAt(pos).setBlockLight(posInChunk(pos),light);
+  async getBlockType(pos) {
+    return (await this.getColumnAt(pos)).getBlockType(posInChunk(pos));
   };
 
-  setSkyLight(pos, light) {
-    this.getColumnAt(pos).setSkyLight(posInChunk(pos),light);
+  async getBlockData(pos) {
+    return (await this.getColumnAt(pos)).getBlockType(posInChunk(pos));
   };
 
-  setBiome(pos, biome) {
-    this.getColumnAt(pos).setBiome(posInChunk(pos),biome);
+  async getBlockLight(pos) {
+    return (await this.getColumnAt(pos)).getBlockLight(posInChunk(pos));
+  };
+
+  async getSkyLight(pos) {
+    return (await this.getColumnAt(pos)).getSkyLight(posInChunk(pos));
+  };
+
+  async getBiome(pos) {
+    return (await this.getColumnAt(pos)).getBiome(posInChunk(pos));
+  };
+
+  setBlockTypeSync(pos,blockType) {
+    this.getColumnAtSync(pos).setBlockType(posInChunk(pos),blockType);
+  };
+
+  setBlockDataSync(pos, data) {
+    this.getColumnAtSync(pos).setBlockData(posInChunk(pos),data);
+  };
+
+  setBlockLightSync(pos, light) {
+    this.getColumnAtSync(pos).setBlockLight(posInChunk(pos),light);
+  };
+
+  setSkyLightSync(pos, light) {
+    this.getColumnAtSync(pos).setSkyLight(posInChunk(pos),light);
+  };
+
+  setBiomeSync(pos, biome) {
+    this.getColumnAtSync(pos).setBiome(posInChunk(pos),biome);
+  };
+
+
+  async setBlockType(pos,blockType) {
+    (await this.getColumnAt(pos)).setBlockType(posInChunk(pos),blockType);
+  };
+
+  async setBlockData(pos, data) {
+    (await this.getColumnAt(pos)).setBlockData(posInChunk(pos),data);
+  };
+
+  async setBlockLight(pos, light) {
+    (await this.getColumnAt(pos)).setBlockLight(posInChunk(pos),light);
+  };
+
+  async setSkyLight(pos, light) {
+    (await this.getColumnAt(pos)).setSkyLight(posInChunk(pos),light);
+  };
+
+  async setBiome(pos, biome) {
+    (await this.getColumnAt(pos)).setBiome(posInChunk(pos),biome);
   };
 
 }

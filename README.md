@@ -12,6 +12,22 @@ See [example.js](example.js)
 
 Build a new world
 
+#### World.getColumns()
+
+Return all loaded columns
+
+
+All the following methods are async and return a promise, corresponding *Sync methods exist.
+
+
+#### World.setColumn(chunkX,chunkZ,chunk)
+
+Set `chunk` at `chunkX` and `chunkZ`
+
+#### World.getColumn(chunkX,chunkZ)
+
+Return the column at `chunkX` and `chunkZ`
+
 #### World.getBlock(pos)
 
 Get the [Block](https://github.com/PrismarineJS/prismarine-block) at [pos](https://github.com/andrewrk/node-vec3)
