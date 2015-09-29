@@ -31,6 +31,7 @@
     "prismarine-block": "0.1.0"
   },
   "dependencies": {
-    "prismarine-chunk": "0.1.0"
+    "prismarine-chunk": "0.1.0",
+    "babel-runtime": "^5.4.4"
   }
 }

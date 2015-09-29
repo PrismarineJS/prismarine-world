@@ -4,6 +4,10 @@ var Vec3=require("vec3");
 
 var world=new World();
 
+var Promise = require("babel-runtime/core-js/promise")["default"];
+
+
+var columnPromises=[];
 for(var chunkX=-1;chunkX<2;chunkX++)
 {
   for(var chunkZ=-1;chunkZ<2;chunkZ++)
@@ -17,9 +21,12 @@ for(var chunkX=-1;chunkX<2;chunkX++)
         }
       }
     }
-    world.setColumnSync(chunkX,chunkZ,chunk);
+    columnPromises.push(world.setColumn(chunkX,chunkZ,chunk));
   }
 }
-world.getBlock(new Vec3(3,50,3)).then(function(block){
+Promise
+  .all(columnPromises)
+  .then(function(){return world.getBlock(new Vec3(3,50,3));})
+  .then(function(block){
     console.log(JSON.stringify(block,null,2));
 });

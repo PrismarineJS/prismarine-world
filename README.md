@@ -17,8 +17,7 @@ Build a new world
 Return all loaded columns
 
 
-All the following methods are async and return a promise, corresponding *Sync methods exist.
-
+All the following methods are async and return a promise.
 
 #### World.setColumn(chunkX,chunkZ,chunk)
 
