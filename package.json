@@ -27,11 +27,10 @@
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
-    "vec3": "~0.1.3",
-    "prismarine-block": "0.1.0"
+    "vec3": "~0.1.3"
   },
   "dependencies": {
-    "prismarine-chunk": "0.1.0",
+    "prismarine-chunk": "0.2.1",
     "babel-runtime": "^5.4.4"
   }
 }
