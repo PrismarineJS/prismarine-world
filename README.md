@@ -76,3 +76,9 @@ Set the block sky `light` at `pos`
 #### World.setBiome(pos, biome)
 
 Set the block `biome` id at `pos`
+
+## History
+
+### 0.1.0
+
+* First version, basic functionality
