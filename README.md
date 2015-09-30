@@ -1,5 +1,7 @@
 # prismarine-world
 
+[![NPM version](https://img.shields.io/npm/v/prismarine-world.svg)](http://npmjs.com/package/prismarine-world)
+
 ## Usage
 
 See [example.js](example.js)
