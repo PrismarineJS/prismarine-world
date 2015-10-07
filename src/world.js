@@ -12,14 +12,20 @@ function posInChunk(pos)
 
 class World {
 
-  constructor() {
+  constructor(chunkGenerator) {
     this.columns = {};
     this.columnsArray = [];
+    this.chunkGenerator = chunkGenerator;
   }
 
   async getColumn(chunkX, chunkZ) {
     await Promise.resolve();
     var key = columnKeyXZ(chunkX, chunkZ);
+
+    if(!this.columns[key] && this.chunkGenerator) {
+      await this.setColumn(chunkX, chunkZ, this.chunkGenerator(chunkX, chunkZ));
+    }
+
     return this.columns[key];
   };
 
