@@ -10,9 +10,10 @@ See [example.js](example.js)
 
 ### World
 
-#### World()
+#### World([generateChunk])
 
-Build a new world
+Create a world instance, takes an optional `generateChunk(chunkX, chunkZ)` function that will get called when a chunk at 
+`chunkX` and `chunkZ` need to be generated.
 
 #### World.getColumns()
 

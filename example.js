@@ -2,7 +2,7 @@ var World=require("./");
 var Chunk = require('prismarine-chunk')("1.8");
 var Vec3=require("vec3");
 
-var world=new World(function(chunkX, chunkZ) {
+function generateSimpleChunk(chunkX, chunkZ) {
   var chunk=new Chunk();
 
   for (var x = 0; x < 16;x++) {
@@ -15,20 +15,16 @@ var world=new World(function(chunkX, chunkZ) {
   }
 
   return chunk;
-});
-
-var Promise = require("babel-runtime/core-js/promise")["default"];
-
-var columnPromises=[];
-for(var chunkX=-1;chunkX<2;chunkX++) {
-  for(var chunkZ=-1;chunkZ<2;chunkZ++) {
-    columnPromises.push(world.getColumn(chunkX,chunkZ));
-  }
 }
 
-Promise
-  .all(columnPromises)
-  .then(function(){return world.getBlock(new Vec3(3,50,3));})
+var world=new World(generateSimpleChunk);
+
+world
+  .getBlock(new Vec3(3,50,3))
   .then(function(block){
     console.log(JSON.stringify(block,null,2));
-});
+  })
+  .then(function(){return world.getBlock(new Vec3(3000,50,3))})
+  .then(function(block){
+    console.log(JSON.stringify(block,null,2));
+  });
