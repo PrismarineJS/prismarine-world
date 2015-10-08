@@ -80,6 +80,10 @@ Set the block `biome` id at `pos`
 
 ## History
 
+### 0.2.0
+
+* Add chunk generation to the API
+
 ### 0.1.0
 
 * First version, basic functionality
