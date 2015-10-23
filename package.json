@@ -6,7 +6,7 @@
   "scripts": {
     "prepublish": "gulp",
     "test": "exit 0",
-    "postinstall": "node_modules/.bin/babel --recursive  --stage 0 -d node_modules/prismarine-provider-anvil/dist/ node_modules/prismarine-provider-anvil/src/"
+    "postinstall": "node_modules/.bin/babel --optional runtime --recursive  --stage 0 -d node_modules/prismarine-provider-anvil/dist/ node_modules/prismarine-provider-anvil/src/"
   },
   "repository": {
     "type": "git",
