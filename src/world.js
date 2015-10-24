@@ -1,4 +1,5 @@
 var Vec3 = require("vec3");
+var Anvil = require("prismarine-provider-anvil");
 
 
 function columnKeyXZ(chunkX, chunkZ) {
@@ -12,18 +13,29 @@ function posInChunk(pos)
 
 class World {
 
-  constructor(chunkGenerator) {
+  constructor(chunkGenerator,regionFolder) {
     this.columns = {};
     this.columnsArray = [];
     this.chunkGenerator = chunkGenerator;
+    this.anvil = regionFolder ? new Anvil(regionFolder) : null;
   }
 
   async getColumn(chunkX, chunkZ) {
     await Promise.resolve();
     var key = columnKeyXZ(chunkX, chunkZ);
 
-    if(!this.columns[key] && this.chunkGenerator) {
-      await this.setColumn(chunkX, chunkZ, this.chunkGenerator(chunkX, chunkZ));
+    if(!this.columns[key]) {
+      var chunk=null;
+      if(this.anvil!=null) {
+        var data=await this.anvil.load(chunkX,chunkZ);
+        if(Object.keys(data.types).length!=0)
+          chunk=data.chunk;
+      }
+      if(chunk == null && this.chunkGenerator)
+        chunk=this.chunkGenerator(chunkX, chunkZ);
+
+      if(chunk!=null)
+        await this.setColumn(chunkX, chunkZ, chunk);
     }
 
     return this.columns[key];
