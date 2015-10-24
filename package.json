@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prepublish": "gulp",
-    "test": "exit 0",
-    "postinstall": "node_modules/.bin/babel --optional runtime --recursive  --stage 0 -d node_modules/prismarine-provider-anvil/dist/ node_modules/prismarine-provider-anvil/src/"
+    "test": "exit 0"
   },
   "repository": {
     "type": "git",
@@ -33,7 +32,6 @@
   "dependencies": {
     "prismarine-chunk": "0.2.1",
     "babel-runtime": "^5.4.4",
-    "prismarine-provider-anvil": "git://github.com/rom1504/prismarine-provider-anvil.git#update",
-    "babel": "5.8.23"
+    "prismarine-provider-anvil": "0.0.0"
   }
 }
