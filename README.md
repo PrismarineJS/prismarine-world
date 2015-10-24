@@ -82,6 +82,10 @@ Set the block `biome` id at `pos`
 
 ## History
 
+### 0.3.0
+
+* Add anvil loading
+
 ### 0.2.0
 
 * Add chunk generation to the API
