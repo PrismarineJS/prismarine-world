@@ -32,6 +32,6 @@
   "dependencies": {
     "prismarine-chunk": "0.2.1",
     "babel-runtime": "^5.4.4",
-    "prismarine-provider-anvil": "0.0.0"
+    "prismarine-provider-anvil": "0.0.1"
   }
 }

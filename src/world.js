@@ -28,7 +28,7 @@ class World {
       var chunk=null;
       if(this.anvil!=null) {
         var data=await this.anvil.load(chunkX,chunkZ);
-        if(Object.keys(data.types).length!=0)
+        if(data!=null && Object.keys(data.types).length!=0)
           chunk=data.chunk;
       }
       if(chunk == null && this.chunkGenerator)
