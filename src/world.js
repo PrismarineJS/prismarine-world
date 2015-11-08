@@ -71,7 +71,7 @@ class World {
   };
 
   async getBlockData(pos) {
-    return (await this.getColumnAt(pos)).getBlockType(posInChunk(pos));
+    return (await this.getColumnAt(pos)).getBlockData(posInChunk(pos));
   };
 
   async getBlockLight(pos) {
