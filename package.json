@@ -27,11 +27,12 @@
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
-    "vec3": "~0.1.3"
+    "vec3": "~0.1.3",
+    "minecraft-data":"0.7.0"
   },
   "dependencies": {
     "prismarine-chunk": "0.2.1",
     "babel-runtime": "^5.4.4",
-    "prismarine-provider-anvil": "0.0.1"
+    "prismarine-provider-anvil": "0.0.2"
   }
 }
