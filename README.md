@@ -82,6 +82,10 @@ Set the block `biome` id at `pos`
 
 ## History
 
+### 0.3.3
+
+* fix minecraft-chunk bug
+
 ### 0.3.2
 
 * fix getBlockData
