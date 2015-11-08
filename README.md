@@ -82,6 +82,10 @@ Set the block `biome` id at `pos`
 
 ## History
 
+### 0.3.2
+
+* fix getBlockData
+
 ### 0.3.1
 
 * check if the region is available in the anvil files
