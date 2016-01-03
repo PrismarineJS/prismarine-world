@@ -31,25 +31,34 @@ class World {
         if(data!=null)
           chunk=data;
       }
-      if(chunk == null && this.chunkGenerator) {
+      const loaded=chunk!=null;
+      if(!loaded && this.chunkGenerator) {
         chunk = this.chunkGenerator(chunkX, chunkZ);
-        if(this.anvil) {
-          await this.anvil.save(chunkX, chunkZ, chunk);
-        }
       }
       if(chunk!=null)
-        await this.setColumn(chunkX, chunkZ, chunk);
+        await this.setColumn(chunkX, chunkZ, chunk,!loaded);
     }
 
     return this.columns[key];
   };
 
-  async setColumn(chunkX,chunkZ,chunk) {
+  async setColumn(chunkX,chunkZ,chunk,save=true) {
     await Promise.resolve();
     var key=columnKeyXZ(chunkX,chunkZ);
     this.columnsArray.push({chunkX:chunkX,chunkZ:chunkZ,column:chunk});
     this.columns[key]=chunk;
+    if(this.anvil && save)
+      await this.anvil.save(chunkX, chunkZ, chunk);
   };
+
+  async saveAt(pos)
+  {
+    var chunkX=Math.floor(pos.x/16);
+    var chunkZ=Math.floor(pos.z/16);
+    const chunk=await this.getColumn(chunkX,chunkZ);
+    if(this.anvil)
+      await this.anvil.save(chunkX, chunkZ, chunk);
+  }
 
   getColumns() {
     return this.columnsArray;
@@ -63,6 +72,7 @@ class World {
 
   async setBlock(pos,block) {
     (await this.getColumnAt(pos)).setBlock(posInChunk(pos),block);
+    this.saveAt(pos);
   };
 
   async getBlock(pos)  {
@@ -91,22 +101,27 @@ class World {
 
   async setBlockType(pos,blockType) {
     (await this.getColumnAt(pos)).setBlockType(posInChunk(pos),blockType);
+    await this.saveAt(pos);
   };
 
   async setBlockData(pos, data) {
     (await this.getColumnAt(pos)).setBlockData(posInChunk(pos),data);
+    await this.saveAt(pos);
   };
 
   async setBlockLight(pos, light) {
     (await this.getColumnAt(pos)).setBlockLight(posInChunk(pos),light);
+    await this.saveAt(pos);
   };
 
   async setSkyLight(pos, light) {
     (await this.getColumnAt(pos)).setSkyLight(posInChunk(pos),light);
+    await this.saveAt(pos);
   };
 
   async setBiome(pos, biome) {
     (await this.getColumnAt(pos)).setBiome(posInChunk(pos),biome);
+    await this.saveAt(pos);
   };
 
 }

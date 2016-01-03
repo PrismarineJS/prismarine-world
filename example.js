@@ -33,6 +33,7 @@ world2
   .then(function(block){
     console.log(JSON.stringify(block,null,2));
   })
+  //.then(function(){return world2.setBlockType(new Vec3(3000,50,3),3)})
   .then(function(){return world2.getBlock(new Vec3(3000,50,3))})
   .then(function(block){
     console.log(JSON.stringify(block,null,2));
