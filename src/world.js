@@ -31,9 +31,12 @@ class World {
         if(data!=null)
           chunk=data;
       }
-      if(chunk == null && this.chunkGenerator)
-        chunk=this.chunkGenerator(chunkX, chunkZ);
-
+      if(chunk == null && this.chunkGenerator) {
+        chunk = this.chunkGenerator(chunkX, chunkZ);
+        if(this.anvil) {
+          await this.anvil.save(chunkX, chunkZ, chunk);
+        }
+      }
       if(chunk!=null)
         await this.setColumn(chunkX, chunkZ, chunk);
     }

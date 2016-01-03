@@ -17,14 +17,26 @@ function generateSimpleChunk(chunkX, chunkZ) {
   return chunk;
 }
 
-var world=new World(generateSimpleChunk);
+if(process.argv.length > 5) {
+  console.log("Usage : node example.js <regionPath> <noGeneration>");
+  process.exit(1);
+}
 
-world
+var regionPath=process.argv[2];
+var noGeneration=process.argv[3]=="yes";
+
+
+var world2=new World(noGeneration ? null : generateSimpleChunk,regionPath);
+
+world2
   .getBlock(new Vec3(3,50,3))
   .then(function(block){
     console.log(JSON.stringify(block,null,2));
   })
-  .then(function(){return world.getBlock(new Vec3(3000,50,3))})
+  .then(function(){return world2.getBlock(new Vec3(3000,50,3))})
   .then(function(block){
     console.log(JSON.stringify(block,null,2));
+  })
+  .catch(function(err){
+    console.log(err.stack);
   });
