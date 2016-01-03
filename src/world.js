@@ -1,5 +1,5 @@
 var Vec3 = require("vec3");
-var Anvil = require("prismarine-provider-anvil");
+var Anvil = require("prismarine-provider-anvil").Anvil;
 
 
 function columnKeyXZ(chunkX, chunkZ) {
@@ -28,8 +28,8 @@ class World {
       var chunk=null;
       if(this.anvil!=null) {
         var data=await this.anvil.load(chunkX,chunkZ);
-        if(data!=null && Object.keys(data.types).length!=0)
-          chunk=data.chunk;
+        if(data!=null)
+          chunk=data;
       }
       if(chunk == null && this.chunkGenerator)
         chunk=this.chunkGenerator(chunkX, chunkZ);
