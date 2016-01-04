@@ -1,4 +1,3 @@
-const mock = require('mock-fs');
 const flatMap = require('flatmap');
 const range = require('range').range;
 const bufferEqual = require('buffer-equal');
@@ -6,6 +5,8 @@ const World=require("../");
 const Chunk = require('prismarine-chunk')("1.8");
 const Vec3=require("vec3");
 const assert = require('assert');
+const mkdirp=require('mkdirp');
+const rimraf=require('rimraf');
 
 describe("saving and loading works",function(){
   this.timeout(60 * 1000);
@@ -25,17 +26,20 @@ describe("saving and loading works",function(){
     return chunk;
   }
 
-  before(() => {
-    mock({
-      'world/region': {}
-    });
+  let regionPath='world/testRegion';
+  before((cb) => {
+    mkdirp(regionPath,cb);
+  });
+
+  after(cb => {
+    rimraf(regionPath, cb);
   });
 
   let originalWorld;
   let size=3;
 
   it("save the world",async ()=> {
-    originalWorld=new World(generateRandomChunk,"world/region");
+    originalWorld=new World(generateRandomChunk,regionPath);
     await Promise.all(
       flatMap(range(0,size),(chunkX)=> range(0,size).map(chunkZ => ({chunkX,chunkZ})))
       .map(({chunkX,chunkZ}) => originalWorld.getColumn(chunkX,chunkZ))
@@ -43,7 +47,7 @@ describe("saving and loading works",function(){
   });
 
   it("load the world correctly",async ()=> {
-    const loadedWorld=new World(null,"world/region");
+    const loadedWorld=new World(null,regionPath);
     await Promise.all(
       flatMap(range(0,size),(chunkX)=> range(0,size).map(chunkZ => ({chunkX,chunkZ})))
         .map(async ({chunkX,chunkZ}) => {

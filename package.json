@@ -33,7 +33,8 @@
     "range": "0.0.3",
     "flatmap": "0.0.3",
     "buffer-equal": "^1.0.0",
-    "mock-fs": "^3.6.0"
+    "rimraf": "^2.5.0",
+    "mkdirp": "^0.5.1"
   },
   "dependencies": {
     "prismarine-chunk": "0.2.1",
