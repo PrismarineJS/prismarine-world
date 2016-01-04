@@ -86,6 +86,10 @@ Returns a promise that is resolved when all saving is done.
 
 ## History
 
+### 0.4.0
+
+* use prismarine-provide-anvil 0.1.0 to implement anvil loading and saving
+
 ### 0.3.3
 
 * fix minecraft-chunk bug
