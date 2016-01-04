@@ -2,6 +2,7 @@ const Vec3 = require("vec3");
 const Anvil = require("prismarine-provider-anvil").Anvil;
 const fifo = require('fifo');
 const EventEmitter = require('events').EventEmitter;
+const once = require('event-promise');
 
 function columnKeyXZ(chunkX, chunkZ) {
   return chunkX + ',' + chunkZ;
@@ -16,6 +17,8 @@ class World extends EventEmitter {
 
   savingQueue=fifo();
   savingInterval;
+  savingInt;
+  finishedSaving=Promise.resolve();
 
   constructor(chunkGenerator,regionFolder,savingInterval=50) {
     super();
@@ -59,16 +62,29 @@ class World extends EventEmitter {
       this.queueSaving(chunkX, chunkZ);
   };
 
+
   startSaving()
   {
-    setInterval(() => {
+    this.savingInt=setInterval(async () => {
       if(this.savingQueue.length==0) {
         this.emit('doneSaving');
         return;
       }
       const {chunkX,chunkZ}=this.savingQueue.pop();
-      this.anvil.save(chunkX,chunkZ,this.columns[columnKeyXZ(chunkX,chunkZ)]);
+      this.finishedSaving=Promise.all([this.finishedSaving,
+        this.anvil.save(chunkX,chunkZ,this.columns[columnKeyXZ(chunkX,chunkZ)])]);
     },this.savingInterval)
+  }
+
+  async waitSaving()
+  {
+    await once(this,'doneSaving');
+    await this.finishedSaving;
+  }
+
+  stopSaving()
+  {
+    clearInterval(this.savingInt);
   }
 
   queueSaving(chunkX,chunkZ)

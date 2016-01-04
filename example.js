@@ -38,6 +38,9 @@ world2
   .then(function(block){
     console.log(JSON.stringify(block,null,2));
   })
+  .then(function(){
+    world2.stopSaving();
+  })
   .catch(function(err){
     console.log(err.stack);
   });

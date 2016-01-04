@@ -7,7 +7,6 @@ const Vec3=require("vec3");
 const assert = require('assert');
 const mkdirp=require('mkdirp');
 const rimraf=require('rimraf');
-const once = require('event-promise');
 
 describe("saving and loading works",function(){
   this.timeout(60 * 1000);
@@ -45,7 +44,7 @@ describe("saving and loading works",function(){
       flatMap(range(0,size),(chunkX)=> range(0,size).map(chunkZ => ({chunkX,chunkZ})))
       .map(({chunkX,chunkZ}) => originalWorld.getColumn(chunkX,chunkZ))
     );
-    await once(originalWorld,'doneSaving');
+    await originalWorld.waitSaving();
   });
 
   it("load the world correctly",async ()=> {
