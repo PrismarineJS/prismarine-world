@@ -37,8 +37,10 @@
     "mkdirp": "^0.5.1"
   },
   "dependencies": {
-    "prismarine-chunk": "0.2.1",
     "babel-runtime": "^5.4.4",
+    "event-promise": "0.0.1",
+    "fifo": "^2.3.0",
+    "prismarine-chunk": "0.2.1",
     "prismarine-provider-anvil": "0.1.0"
   }
 }

@@ -1,6 +1,7 @@
-var Vec3 = require("vec3");
-var Anvil = require("prismarine-provider-anvil").Anvil;
-
+const Vec3 = require("vec3");
+const Anvil = require("prismarine-provider-anvil").Anvil;
+const fifo = require('fifo');
+const EventEmitter = require('events').EventEmitter;
 
 function columnKeyXZ(chunkX, chunkZ) {
   return chunkX + ',' + chunkZ;
@@ -11,13 +12,19 @@ function posInChunk(pos)
   return pos.floored().modulus(new Vec3(16,256,16));
 }
 
-class World {
+class World extends EventEmitter {
 
-  constructor(chunkGenerator,regionFolder) {
+  savingQueue=fifo();
+  savingInterval;
+
+  constructor(chunkGenerator,regionFolder,savingInterval=50) {
+    super();
     this.columns = {};
     this.columnsArray = [];
     this.chunkGenerator = chunkGenerator;
     this.anvil = regionFolder ? new Anvil(regionFolder) : null;
+    if(regionFolder) this.startSaving();
+    this.savingInterval=savingInterval;
   }
 
   async getColumn(chunkX, chunkZ) {
@@ -47,17 +54,34 @@ class World {
     var key=columnKeyXZ(chunkX,chunkZ);
     this.columnsArray.push({chunkX:chunkX,chunkZ:chunkZ,column:chunk});
     this.columns[key]=chunk;
+
     if(this.anvil && save)
-      await this.anvil.save(chunkX, chunkZ, chunk);
+      this.queueSaving(chunkX, chunkZ);
   };
+
+  startSaving()
+  {
+    setInterval(() => {
+      if(this.savingQueue.length==0) {
+        this.emit('doneSaving');
+        return;
+      }
+      const {chunkX,chunkZ}=this.savingQueue.pop();
+      this.anvil.save(chunkX,chunkZ,this.columns[columnKeyXZ(chunkX,chunkZ)]);
+    },this.savingInterval)
+  }
+
+  queueSaving(chunkX,chunkZ)
+  {
+    this.savingQueue.push({chunkX,chunkZ});
+  }
 
   async saveAt(pos)
   {
     var chunkX=Math.floor(pos.x/16);
     var chunkZ=Math.floor(pos.z/16);
-    const chunk=await this.getColumn(chunkX,chunkZ);
     if(this.anvil)
-      await this.anvil.save(chunkX, chunkZ, chunk);
+      this.queueSaving(chunkX, chunkZ);
   }
 
   getColumns() {
@@ -101,27 +125,27 @@ class World {
 
   async setBlockType(pos,blockType) {
     (await this.getColumnAt(pos)).setBlockType(posInChunk(pos),blockType);
-    await this.saveAt(pos);
+    this.saveAt(pos);
   };
 
   async setBlockData(pos, data) {
     (await this.getColumnAt(pos)).setBlockData(posInChunk(pos),data);
-    await this.saveAt(pos);
+    this.saveAt(pos);
   };
 
   async setBlockLight(pos, light) {
     (await this.getColumnAt(pos)).setBlockLight(posInChunk(pos),light);
-    await this.saveAt(pos);
+    this.saveAt(pos);
   };
 
   async setSkyLight(pos, light) {
     (await this.getColumnAt(pos)).setSkyLight(posInChunk(pos),light);
-    await this.saveAt(pos);
+    this.saveAt(pos);
   };
 
   async setBiome(pos, biome) {
     (await this.getColumnAt(pos)).setBiome(posInChunk(pos),biome);
-    await this.saveAt(pos);
+    this.saveAt(pos);
   };
 
 }
