@@ -12,9 +12,15 @@ gulp.task('transpile', function() {
         .pipe(gulp.dest('dist/'));
 });
 
+gulp.task('transpile_test', function() {
+  gulp.src('test/*.js')
+    .pipe(babel(options))
+    .pipe(gulp.dest('distTest/'));
+});
+
 gulp.task('watch', function() {
     gulp.run('transpile');
     gulp.watch('src/*.js', ['transpile']);
 });
 
-gulp.task('default', ['transpile']);
+gulp.task('default', ['transpile','transpile_test']);

@@ -10,12 +10,12 @@ See [example.js](example.js)
 
 ### World
 
-#### World([generateChunk,[regionDir]])
+#### World([generateChunk,[regionDir]],[savingInterval])
 
 Create a world instance, takes an optional `generateChunk(chunkX, chunkZ)` function that will get called when a chunk at 
 `chunkX` and `chunkZ` need to be generated. Takes a second optional arguments : `regionDir` containing the anvil regions.
 If provided, prismarine-world will first try to load the map from these regions, and then try to generate the world if 
-the chunk isn't saved.
+the chunk isn't saved. `savingInterval` default to 50ms.
 
 #### World.getColumns()
 
@@ -79,6 +79,10 @@ Set the block sky `light` at `pos`
 #### World.setBiome(pos, biome)
 
 Set the block `biome` id at `pos`
+
+#### World.waitSaving()
+
+Returns a promise that is resolved when all saving is done.
 
 ## History
 

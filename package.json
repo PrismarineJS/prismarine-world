@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prepublish": "gulp",
-    "test": "exit 0"
+    "test": "mocha distTest/"
   },
   "repository": {
     "type": "git",
@@ -28,11 +28,19 @@
     "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
     "vec3": "~0.1.3",
-    "minecraft-data":"0.7.0"
+    "minecraft-data": "0.7.0",
+    "mocha": "^2.3.4",
+    "range": "0.0.3",
+    "flatmap": "0.0.3",
+    "buffer-equal": "^1.0.0",
+    "rimraf": "^2.5.0",
+    "mkdirp": "^0.5.1"
   },
   "dependencies": {
-    "prismarine-chunk": "0.2.1",
     "babel-runtime": "^5.4.4",
-    "prismarine-provider-anvil": "0.0.2"
+    "event-promise": "0.0.1",
+    "fifo": "^2.3.0",
+    "prismarine-chunk": "0.2.1",
+    "prismarine-provider-anvil": "0.1.0"
   }
 }
