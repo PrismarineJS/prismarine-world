@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prepublish": "gulp",
-    "test": "exit 0"
+    "test": "mocha distTest/"
   },
   "repository": {
     "type": "git",
@@ -39,6 +39,6 @@
   "dependencies": {
     "prismarine-chunk": "0.2.1",
     "babel-runtime": "^5.4.4",
-    "prismarine-provider-anvil": "0.0.2"
+    "prismarine-provider-anvil": "0.1.0"
   }
 }
