@@ -20,14 +20,14 @@ class World extends EventEmitter {
   savingInt;
   finishedSaving=Promise.resolve();
 
-  constructor(chunkGenerator,regionFolder,savingInterval=50) {
+  constructor(chunkGenerator,regionFolder,savingInterval=100) {
     super();
     this.columns = {};
     this.columnsArray = [];
     this.chunkGenerator = chunkGenerator;
     this.anvil = regionFolder ? new Anvil(regionFolder) : null;
-    if(regionFolder) this.startSaving();
     this.savingInterval=savingInterval;
+    if(regionFolder) this.startSaving();
   }
 
   async getColumn(chunkX, chunkZ) {
