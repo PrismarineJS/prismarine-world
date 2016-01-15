@@ -94,6 +94,10 @@ Returns a promise that is resolved when all saving is done.
 
 ## History
 
+### 0.5.0
+
+* add World.initialize
+
 ### 0.4.0
 
 * use prismarine-provide-anvil 0.1.0 to implement anvil loading and saving
