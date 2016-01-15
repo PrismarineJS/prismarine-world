@@ -30,6 +30,24 @@ class World extends EventEmitter {
     if(regionFolder) this.startSaving();
   }
 
+  initialize(iniFunc,length,width,height=256,iniPos=new Vec3(0,0,0)) {
+    const ps=[];
+    for(let chunkZ=0;chunkZ<Math.ceil(length/16);chunkZ++) {
+      for(let chunkX=0;chunkX<Math.ceil(width/16);chunkX++) {
+        const actualChunkX=chunkX+Math.floor(iniPos.x/16);
+        const actualChunkZ=chunkZ+Math.floor(iniPos.z/16);
+        ps.push(this.getColumn(actualChunkX,actualChunkZ)
+          .then(chunk => {
+            const offsetX=chunkX*16;
+            const offsetZ=chunkZ*16;
+            chunk.initialize((x,y,z) => iniFunc(x+offsetX,y,z+offsetZ),Math.min(16,length-offsetZ),Math.min(16,width-offsetX),height,iniPos.x%16,iniPos.y,iniPos.z%16);
+            return this.setColumn(actualChunkX,actualChunkZ,chunk);
+          }));
+      }
+    }
+    return Promise.all(ps);
+  };
+
   async getColumn(chunkX, chunkZ) {
     await Promise.resolve();
     var key = columnKeyXZ(chunkX, chunkZ);

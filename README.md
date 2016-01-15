@@ -17,6 +17,14 @@ Create a world instance, takes an optional `generateChunk(chunkX, chunkZ)` funct
 If provided, prismarine-world will first try to load the map from these regions, and then try to generate the world if 
 the chunk isn't saved. `savingInterval` default to 50ms.
 
+#### World.initialize(iniFunc,length,width,height=256,iniPos=new Vec3(0,0,0))
+
+Initialize the world with a given blocks cube. Useful to load quickly a schematic.
+
+* `iniFunc` is a function(x,y,z) that returns a prismarine-block
+* `length`, `width` and `height` are the size to iterate on
+* `iniPos` is the position where to start the iteration
+
 #### World.getColumns()
 
 Return all loaded columns
