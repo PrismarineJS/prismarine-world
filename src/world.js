@@ -31,36 +31,31 @@ class World extends EventEmitter {
   }
 
   initialize(iniFunc,length,width,height=256,iniPos=new Vec3(0,0,0)) {
+    function inZone(x,y,z) {
+      if(x>=width || x<0)
+        return false;
+      if(z>=length || z<0) {
+        return false;
+      }
+      if(y>=height || y<0)
+        return false;
+      return true;
+    }
     const ps=[];
-    const chunkLength=Math.ceil(length/16);
-    const chunkWidth=Math.ceil(width/16);
+    const chunkLength=Math.ceil((length+iniPos.z%16)/16);
+    const chunkWidth=Math.ceil((width+iniPos.x%16)/16);
     for(let chunkZ=0;chunkZ<chunkLength;chunkZ++) {
+      const actualChunkZ=chunkZ+Math.floor(iniPos.z/16);
       for(let chunkX=0;chunkX<chunkWidth;chunkX++) {
         const actualChunkX=chunkX+Math.floor(iniPos.x/16);
-        const actualChunkZ=chunkZ+Math.floor(iniPos.z/16);
         ps.push(this.getColumn(actualChunkX,actualChunkZ)
           .then(chunk => {
-            const offsetX=chunkX*16;
-            const relChunkX=chunkX==0 ? iniPos.x%16 : 0;
-            const relChunkZ=chunkZ==0 ? iniPos.z%16 : 0;
-            const relChunkX2=chunkX==0 ? 0 : iniPos.x%16;
-            const relChunkZ2=chunkZ==0 ? 0 : iniPos.z%16;
-            const offsetZ=chunkZ*16;
-            let chunkLength=16;
-            if(chunkZ==chunkLength)
-              chunkLength=chunkLength%16;
-            if(chunkZ==0)
-              chunkLength-=iniPos.z%16;
-
-            let chunkWidth=16;
-            if(chunkX==chunkWidth)
-              chunkWidth=chunkWidth%16;
-            if(chunkX==0)
-              chunkWidth-=iniPos.x%16;
-            chunk.initialize((x,y,z) => iniFunc(x+offsetX-relChunkX2,y,z+offsetZ-relChunkZ2),chunkLength,chunkWidth,height,relChunkX
-              ,iniPos.y,relChunkZ);
+            const offsetX=chunkX*16-(iniPos.x%16);
+            const offsetZ=chunkZ*16-(iniPos.z%16);
+            chunk.initialize((x,y,z) => inZone(x+offsetX,y-iniPos.y,z+offsetZ) ? iniFunc(x+offsetX,y-iniPos.y,z+offsetZ) : null);
             return this.setColumn(actualChunkX,actualChunkZ,chunk);
-          }));
+          })
+          .then(() => ({chunkX:actualChunkX,chunkZ:actualChunkZ})));
       }
     }
     return Promise.all(ps);

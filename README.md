@@ -25,6 +25,8 @@ Initialize the world with a given blocks cube. Useful to load quickly a schemati
 * `length`, `width` and `height` are the size to iterate on
 * `iniPos` is the position where to start the iteration
 
+Returns a promise containing an array of `{chunkX,chunkZ}`
+
 #### World.getColumns()
 
 Return all loaded columns
