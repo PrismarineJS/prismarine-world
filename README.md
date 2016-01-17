@@ -94,6 +94,10 @@ Returns a promise that is resolved when all saving is done.
 
 ## History
 
+### 0.5.2
+
+* bump prismarine-chunk
+
 ### 0.5.1
 
 * fix initialize for iniPos%16 !=0
