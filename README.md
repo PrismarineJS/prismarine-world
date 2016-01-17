@@ -96,6 +96,10 @@ Returns a promise that is resolved when all saving is done.
 
 ## History
 
+### 0.5.5
+
+* bump prismarine-provider-anvil
+
 ### 0.5.4
 
 * fix negative iniPos in initialize
