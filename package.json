@@ -41,6 +41,6 @@
     "event-promise": "0.0.1",
     "fifo": "^2.3.0",
     "prismarine-chunk": "0.3.2",
-    "prismarine-provider-anvil": "0.1.0"
+    "prismarine-provider-anvil": "^0.2.1"
   }
 }
