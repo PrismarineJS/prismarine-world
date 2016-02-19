@@ -96,6 +96,10 @@ Returns a promise that is resolved when all saving is done.
 
 ## History
 
+### 1.0.0
+
+* bump dependencies
+
 ### 0.5.5
 
 * bump prismarine-provider-anvil
