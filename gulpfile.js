@@ -1,26 +1,48 @@
 var gulp = require('gulp');
 
+var plumber = require('gulp-plumber');
 var babel = require('gulp-babel');
 var options = {
-    stage: 0, // Dat ES7 goodness
-    optional: ["runtime"]
+  presets: ['babel-preset-stage-0','es2015'],
+  plugins:['transform-runtime',"transform-class-properties"]
 };
 
-gulp.task('transpile', function() {
-    gulp.src('src/*.js')
-        .pipe(babel(options))
-        .pipe(gulp.dest('dist/'));
+var sourcemaps = require('gulp-sourcemaps');
+
+gulp.task('compile', function() {
+  return gulp
+    .src('src/**/*.js')
+    .pipe(plumber({
+      errorHandler: function(err) {
+        console.error(err.stack);
+        this.emit('end');
+      }
+    }))
+    .pipe(sourcemaps.init())
+    .pipe(babel(options))
+    .pipe(plumber.stop())
+    .pipe(sourcemaps.write('maps/'))
+    .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('transpile_test', function() {
-  gulp.src('test/*.js')
+gulp.task('compileTest', function() {
+  return gulp
+    .src('test/**/*.js')
+    .pipe(plumber({
+      errorHandler: function(err) {
+        console.error(err.stack);
+        this.emit('end');
+      }
+    }))
+    .pipe(sourcemaps.init())
     .pipe(babel(options))
+    .pipe(plumber.stop())
+    .pipe(sourcemaps.write('maps/'))
     .pipe(gulp.dest('distTest/'));
 });
 
 gulp.task('watch', function() {
-    gulp.run('transpile');
-    gulp.watch('src/*.js', ['transpile']);
+  return gulp.watch('src/**/*.js', ['compile']);
 });
 
-gulp.task('default', ['transpile','transpile_test']);
+gulp.task('default', ['compile','compileTest']);
