@@ -96,6 +96,10 @@ Returns a promise that is resolved when all saving is done.
 
 ## History
 
+### 1.0.1
+
+* update to babel6
+
 ### 1.0.0
 
 * bump dependencies
