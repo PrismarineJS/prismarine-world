@@ -3,6 +3,7 @@ const Anvil = require("prismarine-provider-anvil").Anvil;
 const fifo = require('fifo');
 const EventEmitter = require('events').EventEmitter;
 const once = require('event-promise');
+const Chunk = require('prismarine-chunk')("1.8");
 
 function columnKeyXZ(chunkX, chunkZ) {
   return chunkX + ',' + chunkZ;
@@ -27,6 +28,12 @@ class World extends EventEmitter {
     this.chunkGenerator = chunkGenerator;
     this.anvil = regionFolder ? new Anvil(regionFolder) : null;
     this.savingInterval=savingInterval;
+
+    this.cacheTypes = {};
+    this.cacheData = {};
+    this.cacheLights = {};
+    this.cacheSkyLights = {};
+
     if(regionFolder) this.startSaving();
   }
 
@@ -69,23 +76,59 @@ class World extends EventEmitter {
     return Promise.all(ps);
   };
 
-  async getColumn(chunkX, chunkZ) {
+  async getColumn(chunkX, chunkZ, needCreate=true) {
     await Promise.resolve();
-    var key = columnKeyXZ(chunkX, chunkZ);
+    const key = columnKeyXZ(chunkX, chunkZ);
 
-    if(!this.columns[key]) {
-      var chunk=null;
-      if(this.anvil!=null) {
-        var data=await this.anvil.load(chunkX,chunkZ);
-        if(data!=null)
-          chunk=data;
+    if(!this.columns[key] && needCreate) {
+      let chunk = null;
+
+      if(this.anvil != null) {
+        const data = await this.anvil.load(chunkX,chunkZ);
+        if(data != null) chunk = data;
       }
-      const loaded=chunk!=null;
+
+      const loaded = chunk != null;
+
       if(!loaded && this.chunkGenerator) {
-        chunk = this.chunkGenerator(chunkX, chunkZ);
+        const names = ['setBlockType', 'setBlockData', 'setBlockLight', 'setSkyLight'];
+        const handlers = {};
+        const curChunk = new Chunk();
+
+        let used;
+
+        names.forEach(name => {
+          handlers[name] = (pos, data) => {
+            const curChunkX = Math.floor(pos.x/16);
+            const curChunkZ = Math.floor(pos.z/16);
+
+            if(curChunkZ == chunkZ && curChunkX == chunkX) {
+              curChunk[name](posInChunk(pos), data);
+              used = true;
+            } else {
+              this[name](pos, data);
+            }
+          };
+        });
+
+        this.chunkGenerator.call(handlers, chunkX, chunkZ);
+
+        if(used) {
+          const cacheTypes = this.cacheTypes[key];
+          const cacheData = this.cacheData[key];
+          const cacheLights = this.cacheLights[key];
+          const cacheSkyLights = this.cacheSkyLights[key];
+
+          if(cacheTypes) for(let pos in cacheTypes) curChunk.setBlockType(new Vec3(pos), cacheTypes[pos]);
+          if(cacheData) for(let pos in cacheData) curChunk.setBlockData(new Vec3(pos), cacheData[pos]);
+          if(cacheLights) for(let pos in cacheLights) curChunk.setBlockLight(new Vec3(pos), cacheLights[pos]);
+          if(cacheSkyLights) for(let pos in cacheSkyLights) curChunk.setSkyLight(new Vec3(pos), cacheSkyLights[pos]);
+
+          chunk = curChunk;
+        }
       }
-      if(chunk!=null)
-        await this.setColumn(chunkX, chunkZ, chunk,!loaded);
+
+      if(chunk != null) await this.setColumn(chunkX, chunkZ, chunk, !loaded);
     }
 
     return this.columns[key];
@@ -143,10 +186,10 @@ class World extends EventEmitter {
     return this.columnsArray;
   };
 
-  async getColumnAt(pos) {
-    var chunkX=Math.floor(pos.x/16);
-    var chunkZ=Math.floor(pos.z/16);
-    return this.getColumn(chunkX,chunkZ);
+  async getColumnAt(pos, needCreate) {
+    var chunkX = Math.floor(pos.x/16);
+    var chunkZ = Math.floor(pos.z/16);
+    return this.getColumn(chunkX, chunkZ, needCreate);
   };
 
   async setBlock(pos,block) {
@@ -178,24 +221,38 @@ class World extends EventEmitter {
     return (await this.getColumnAt(pos)).getBiome(posInChunk(pos));
   };
 
-  async setBlockType(pos,blockType) {
-    (await this.getColumnAt(pos)).setBlockType(posInChunk(pos),blockType);
-    this.saveAt(pos);
-  };
+  async setBlockCache(pos, data, fn, cache) {
+    let column = await this.getColumnAt(pos, false);
+
+    if(!column) {
+      const chunkX = Math.floor(pos.x/16);
+      const chunkZ = Math.floor(pos.z/16);
+      const key = columnKeyXZ(chunkX, chunkZ);
+
+      if(!this[cache][key]) this[cache][key] = {};
+
+      this[cache][key][posInChunk(pos)] = data;
+    } else {
+      column[fn](posInChunk(pos), data);
+
+      this.saveAt(pos);
+    }
+  }
+
+  async setBlockType(pos, blockType) {
+    await this.setBlockCache(pos, blockType, 'setBlockType', 'cacheTypes');
+  }
 
   async setBlockData(pos, data) {
-    (await this.getColumnAt(pos)).setBlockData(posInChunk(pos),data);
-    this.saveAt(pos);
+    await this.setBlockCache(pos, data, 'setBlockData', 'cacheData');
   };
 
   async setBlockLight(pos, light) {
-    (await this.getColumnAt(pos)).setBlockLight(posInChunk(pos),light);
-    this.saveAt(pos);
+    await this.setBlockCache(pos, light, 'setBlockLight', 'cacheLights');
   };
 
   async setSkyLight(pos, light) {
-    (await this.getColumnAt(pos)).setSkyLight(posInChunk(pos),light);
-    this.saveAt(pos);
+    await this.setBlockCache(pos, blockType, 'setSkyLight', 'cacheSkyLights');
   };
 
   async setBiome(pos, biome) {
