@@ -9,25 +9,23 @@ function columnKeyXZ(chunkX, chunkZ) {
   return chunkX + ',' + chunkZ;
 }
 
-function posInChunk(pos)
-{
-  return pos.floored().modulus(new Vec3(16,256,16));
+function posInChunk(pos) {
+  return pos.floored().modulus(new Vec3(16, 256, 16));
 }
 
 class World extends EventEmitter {
-
-  savingQueue=fifo();
+  savingQueue = fifo();
   savingInterval;
   savingInt;
-  finishedSaving=Promise.resolve();
+  finishedSaving = Promise.resolve();
 
-  constructor(chunkGenerator,regionFolder,savingInterval=100) {
+  constructor(chunkGenerator, regionFolder, savingInterval=100) {
     super();
     this.columns = {};
     this.columnsArray = [];
     this.chunkGenerator = chunkGenerator;
     this.anvil = regionFolder ? new Anvil(regionFolder) : null;
-    this.savingInterval=savingInterval;
+    this.savingInterval = savingInterval;
 
     this.cacheTypes = {};
     this.cacheData = {};
@@ -37,44 +35,42 @@ class World extends EventEmitter {
     if(regionFolder) this.startSaving();
   }
 
-  initialize(iniFunc,length,width,height=256,iniPos=new Vec3(0,0,0)) {
-    function module(a,b)
-    {
-      const m=a%b;
-      if(m<0)
-        return b+m;
+  initialize(iniFunc, length, width, height=256, iniPos=new Vec3(0,0,0)) {
+    function module(a, b) {
+      const m = a%b;
+      if(m < 0) return b+m;
       return m;
     }
 
     function inZone(x,y,z) {
-      if(x>=width || x<0)
-        return false;
-      if(z>=length || z<0) {
-        return false;
-      }
-      if(y>=height || y<0)
-        return false;
+      if(x >= width || x < 0) return false;
+      if(z >= length || z < 0) return false;
+      if(y >= height || y < 0) return false;
       return true;
     }
-    const ps=[];
-    const chunkLength=Math.ceil((length+module(iniPos.z,16))/16);
-    const chunkWidth=Math.ceil((width+module(iniPos.x,16))/16);
-    for(let chunkZ=0;chunkZ<chunkLength;chunkZ++) {
-      const actualChunkZ=chunkZ+Math.floor(iniPos.z/16);
-      for(let chunkX=0;chunkX<chunkWidth;chunkX++) {
-        const actualChunkX=chunkX+Math.floor(iniPos.x/16);
-        ps.push(this.getColumn(actualChunkX,actualChunkZ)
+
+    const ps = [];
+    const chunkLength = Math.ceil((length + module(iniPos.z, 16)) / 16);
+    const chunkWidth = Math.ceil((width + module(iniPos.x, 16)) / 16);
+
+    for(let chunkZ = 0; chunkZ < chunkLength; chunkZ++) {
+      const actualChunkZ = chunkZ + Math.floor(iniPos.z / 16);
+      for(let chunkX = 0; chunkX < chunkWidth; chunkX++) {
+        const actualChunkX = chunkX + Math.floor(iniPos.x / 16);
+        ps.push(this.getColumn(actualChunkX, actualChunkZ)
           .then(chunk => {
-            const offsetX=chunkX*16-module(iniPos.x,16);
-            const offsetZ=chunkZ*16-module(iniPos.z,16);
-            chunk.initialize((x,y,z) => inZone(x+offsetX,y-iniPos.y,z+offsetZ) ? iniFunc(x+offsetX,y-iniPos.y,z+offsetZ) : null);
-            return this.setColumn(actualChunkX,actualChunkZ,chunk);
+            const offsetX = chunkX * 16 - module(iniPos.x, 16);
+            const offsetZ = chunkZ * 16 - module(iniPos.z, 16);
+            chunk.initialize((x, y, z) => inZone(x + offsetX, y - iniPos.y, z + offsetZ) ? iniFunc(x + offsetX, y - iniPos.y, z + offsetZ) : null);
+            return this.setColumn(actualChunkX, actualChunkZ, chunk);
           })
-          .then(() => ({chunkX:actualChunkX,chunkZ:actualChunkZ})));
+          .then(() => ({ chunkX: actualChunkX, chunkZ: actualChunkZ }))
+        );
       }
     }
+
     return Promise.all(ps);
-  };
+  }
 
   async getColumn(chunkX, chunkZ, needCreate=true) {
     await Promise.resolve();
@@ -134,66 +130,62 @@ class World extends EventEmitter {
     return this.columns[key];
   };
 
-  async setColumn(chunkX,chunkZ,chunk,save=true) {
+  async setColumn(chunkX, chunkZ, chunk, save=true) {
     await Promise.resolve();
-    var key=columnKeyXZ(chunkX,chunkZ);
-    this.columnsArray.push({chunkX:chunkX,chunkZ:chunkZ,column:chunk});
-    this.columns[key]=chunk;
 
-    if(this.anvil && save)
-      this.queueSaving(chunkX, chunkZ);
-  };
+    const key = columnKeyXZ(chunkX, chunkZ);
 
+    this.columnsArray.push({ chunkX: chunkX, chunkZ: chunkZ, column: chunk });
+    this.columns[key] = chunk;
 
-  startSaving()
-  {
-    this.savingInt=setInterval(async () => {
-      if(this.savingQueue.length==0) {
-        this.emit('doneSaving');
-        return;
-      }
-      const {chunkX,chunkZ}=this.savingQueue.pop();
-      this.finishedSaving=Promise.all([this.finishedSaving,
-        this.anvil.save(chunkX,chunkZ,this.columns[columnKeyXZ(chunkX,chunkZ)])]);
-    },this.savingInterval)
+    if(this.anvil && save) this.queueSaving(chunkX, chunkZ);
   }
 
-  async waitSaving()
-  {
-    await once(this,'doneSaving');
+  startSaving() {
+    this.savingInt = setInterval(async () => {
+      if(!this.savingQueue.length) return this.emit('doneSaving');
+
+      const { chunkX, chunkZ } = this.savingQueue.pop();
+
+      this.finishedSaving = Promise.all([
+        this.finishedSaving,
+        this.anvil.save(chunkX, chunkZ, this.columns[columnKeyXZ(chunkX, chunkZ)])
+      ]);
+    }, this.savingInterval)
+  }
+
+  async waitSaving() {
+    await once(this, 'doneSaving');
     await this.finishedSaving;
   }
 
-  stopSaving()
-  {
+  stopSaving() {
     clearInterval(this.savingInt);
   }
 
-  queueSaving(chunkX,chunkZ)
-  {
-    this.savingQueue.push({chunkX,chunkZ});
+  queueSaving(chunkX, chunkZ) {
+    this.savingQueue.push({ chunkX, chunkZ });
   }
 
-  async saveAt(pos)
-  {
-    var chunkX=Math.floor(pos.x/16);
-    var chunkZ=Math.floor(pos.z/16);
-    if(this.anvil)
-      this.queueSaving(chunkX, chunkZ);
+  async saveAt(pos) {
+    const chunkX = Math.floor(pos.x / 16);
+    const chunkZ = Math.floor(pos.z / 16);
+    if(this.anvil) this.queueSaving(chunkX, chunkZ);
   }
 
   getColumns() {
     return this.columnsArray;
-  };
+  }
 
   async getColumnAt(pos, needCreate) {
-    var chunkX = Math.floor(pos.x/16);
-    var chunkZ = Math.floor(pos.z/16);
+    const chunkX = Math.floor(pos.x / 16);
+    const chunkZ = Math.floor(pos.z / 16);
+
     return this.getColumn(chunkX, chunkZ, needCreate);
   };
 
-  async setBlock(pos,block) {
-    (await this.getColumnAt(pos)).setBlock(posInChunk(pos),block);
+  async setBlock(pos, block) {
+    (await this.getColumnAt(pos)).setBlock(posInChunk(pos), block);
     this.saveAt(pos);
   };
 
@@ -256,7 +248,7 @@ class World extends EventEmitter {
   };
 
   async setBiome(pos, biome) {
-    (await this.getColumnAt(pos)).setBiome(posInChunk(pos),biome);
+    (await this.getColumnAt(pos)).setBiome(posInChunk(pos), biome);
     this.saveAt(pos);
   };
 
