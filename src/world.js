@@ -91,8 +91,6 @@ class World extends EventEmitter {
         const handlers = {};
         const curChunk = new Chunk();
 
-        let used;
-
         names.forEach(name => {
           handlers[name] = (pos, data) => {
             const curChunkX = Math.floor(pos.x/16);
@@ -109,22 +107,20 @@ class World extends EventEmitter {
 
         this.chunkGenerator.call(handlers, chunkX, chunkZ);
 
-        if(used) {
-          const cacheTypes = this.cacheTypes[key];
-          const cacheData = this.cacheData[key];
-          const cacheLights = this.cacheLights[key];
-          const cacheSkyLights = this.cacheSkyLights[key];
+        const cacheTypes = this.cacheTypes[key];
+        const cacheData = this.cacheData[key];
+        const cacheLights = this.cacheLights[key];
+        const cacheSkyLights = this.cacheSkyLights[key];
 
-          if(cacheTypes) for(let pos in cacheTypes) curChunk.setBlockType(new Vec3(pos), cacheTypes[pos]);
-          if(cacheData) for(let pos in cacheData) curChunk.setBlockData(new Vec3(pos), cacheData[pos]);
-          if(cacheLights) for(let pos in cacheLights) curChunk.setBlockLight(new Vec3(pos), cacheLights[pos]);
-          if(cacheSkyLights) for(let pos in cacheSkyLights) curChunk.setSkyLight(new Vec3(pos), cacheSkyLights[pos]);
+        if(cacheTypes) for(let pos in cacheTypes) curChunk.setBlockType(new Vec3(pos), cacheTypes[pos]);
+        if(cacheData) for(let pos in cacheData) curChunk.setBlockData(new Vec3(pos), cacheData[pos]);
+        if(cacheLights) for(let pos in cacheLights) curChunk.setBlockLight(new Vec3(pos), cacheLights[pos]);
+        if(cacheSkyLights) for(let pos in cacheSkyLights) curChunk.setSkyLight(new Vec3(pos), cacheSkyLights[pos]);
 
-          chunk = curChunk;
-        }
+        chunk = curChunk;
       }
 
-      if(chunk != null) await this.setColumn(chunkX, chunkZ, chunk, !loaded);
+      if(chunk != null) await this.setColumn(chunkX, chunkZ, chunk);
     }
 
     return this.columns[key];
