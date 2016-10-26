@@ -37,7 +37,7 @@
     "gulp-sourcemaps": "^1.3.0",
     "minecraft-data": "^2.0.0",
     "mkdirp": "^0.5.1",
-    "mocha": "^2.3.4",
+    "mocha": "^3.1.2",
     "range": "0.0.3",
     "rimraf": "^2.5.0",
     "vec3": "~0.1.3"
@@ -47,6 +47,6 @@
     "event-promise": "0.0.1",
     "fifo": "^2.3.0",
     "prismarine-chunk": "^1.0.1",
-    "prismarine-provider-anvil": "^1.0.1"
+    "prismarine-provider-anvil": "^1.1.0"
   }
 }
