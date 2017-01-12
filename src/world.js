@@ -1,5 +1,5 @@
 const Vec3 = require("vec3");
-const Anvil = require("prismarine-provider-anvil").Anvil;
+let Anvil;
 const fifo = require('fifo');
 const EventEmitter = require('events').EventEmitter;
 const once = require('event-promise');
@@ -205,4 +205,11 @@ class World extends EventEmitter {
 
 }
 
-module.exports = World;
+
+function loader(mcVersion) {
+  Anvil = require("prismarine-provider-anvil").Anvil(mcVersion);
+  return World;
+}
+
+
+module.exports = loader;

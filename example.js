@@ -1,4 +1,4 @@
-var World=require("./");
+var World=require("./")("1.8");
 var Chunk = require('prismarine-chunk')("1.8");
 var Vec3=require("vec3");
 

@@ -1,7 +1,7 @@
 const flatMap = require('flatmap');
 const range = require('range').range;
 const bufferEqual = require('buffer-equal');
-const World=require("../");
+const World=require("../")("1.8");
 const Chunk = require('prismarine-chunk')("1.8");
 const Vec3=require("vec3");
 const assert = require('assert');
