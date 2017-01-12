@@ -96,6 +96,10 @@ Returns a promise that is resolved when all saving is done.
 
 ## History
 
+### 2.0.0
+
+* cross version support
+
 ### 1.0.2
 
 * update dependencies, fix issue with provider anvil
