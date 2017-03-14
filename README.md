@@ -1,5 +1,7 @@
 # prismarine-world
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/PrismarineJS/prismarine-world.svg)](https://greenkeeper.io/)
+
 [![NPM version](https://img.shields.io/npm/v/prismarine-world.svg)](http://npmjs.com/package/prismarine-world)
 
 ## Usage
