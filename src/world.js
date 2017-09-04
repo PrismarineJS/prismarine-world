@@ -26,7 +26,7 @@ class World extends EventEmitter {
   }
 
   initialize (iniFunc, length, width, height = 256, iniPos = new Vec3(0, 0, 0)) {
-    function module (a, b) {
+    function modulus (a, b) {
       const m = a % b
       if (m < 0) { return b + m }
       return m
@@ -41,16 +41,16 @@ class World extends EventEmitter {
       return true
     }
     const ps = []
-    const chunkLength = Math.ceil((length + module(iniPos.z, 16)) / 16)
-    const chunkWidth = Math.ceil((width + module(iniPos.x, 16)) / 16)
+    const chunkLength = Math.ceil((length + modulus(iniPos.z, 16)) / 16)
+    const chunkWidth = Math.ceil((width + modulus(iniPos.x, 16)) / 16)
     for (let chunkZ = 0; chunkZ < chunkLength; chunkZ++) {
       const actualChunkZ = chunkZ + Math.floor(iniPos.z / 16)
       for (let chunkX = 0; chunkX < chunkWidth; chunkX++) {
         const actualChunkX = chunkX + Math.floor(iniPos.x / 16)
         ps.push(this.getColumn(actualChunkX, actualChunkZ)
           .then(chunk => {
-            const offsetX = chunkX * 16 - module(iniPos.x, 16)
-            const offsetZ = chunkZ * 16 - module(iniPos.z, 16)
+            const offsetX = chunkX * 16 - modulus(iniPos.x, 16)
+            const offsetZ = chunkZ * 16 - modulus(iniPos.z, 16)
             chunk.initialize((x, y, z) => inZone(x + offsetX, y - iniPos.y, z + offsetZ) ? iniFunc(x + offsetX, y - iniPos.y, z + offsetZ) : null)
             return this.setColumn(actualChunkX, actualChunkZ, chunk)
           })
