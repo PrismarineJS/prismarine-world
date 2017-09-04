@@ -1,1 +1,1 @@
-module.exports = require('./dist/world.js');
+module.exports = require('./src/world.js')
