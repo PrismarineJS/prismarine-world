@@ -2,3 +2,4 @@ node_modules/
 dist/
 distTest/
 world/
+package-lock.json
