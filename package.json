@@ -4,6 +4,8 @@
   "description": "The core implementation of worlds for prismarine",
   "main": "index.js",
   "scripts": {
+    "posttest": "npm run lint",
+    "lint": "eslint .",
     "test": "mocha test/"
   },
   "repository": {
@@ -17,6 +19,10 @@
     "voxel",
     "game"
   ],
+  "engines": {
+    "nodejs": ">=8.0.0"
+  },
+  "enginesStrict": true,
   "author": "Will Franzen <wtfranzen@gmail.com> (http://will.xyz/)",
   "license": "MIT",
   "bugs": {
@@ -25,6 +31,12 @@
   "homepage": "https://github.com/PrismarineJS/prismarine-world",
   "devDependencies": {
     "buffer-equal": "^1.0.0",
+    "eslint": "^4.2.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "flatmap": "0.0.3",
     "minecraft-data": "^2.0.0",
     "mkdirp": "^0.5.1",
