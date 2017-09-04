@@ -15,13 +15,11 @@ function posInChunk(pos)
 
 class World extends EventEmitter {
 
-  savingQueue=fifo();
-  savingInterval;
-  savingInt;
-  finishedSaving=Promise.resolve();
-
   constructor(chunkGenerator,regionFolder,savingInterval=100) {
     super();
+    this.savingQueue=fifo();
+    this.savingInt;
+    this.finishedSaving=Promise.resolve();
     this.columns = {};
     this.columnsArray = [];
     this.chunkGenerator = chunkGenerator;
