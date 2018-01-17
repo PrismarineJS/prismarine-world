@@ -22,7 +22,7 @@ class World extends EventEmitter {
     this.chunkGenerator = chunkGenerator
     this.anvil = regionFolder ? new Anvil(regionFolder) : null
     this.savingInterval = savingInterval
-    if (regionFolder && savingInterval != 0) this.startSaving()
+    if (regionFolder && savingInterval !== 0) this.startSaving()
   }
 
   initialize (iniFunc, length, width, height = 256, iniPos = new Vec3(0, 0, 0)) {
