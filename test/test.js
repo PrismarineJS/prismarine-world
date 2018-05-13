@@ -1,3 +1,5 @@
+/* eslint-env mocha */
+
 const flatMap = require('flatmap')
 const range = require('range').range
 const bufferEqual = require('buffer-equal')
