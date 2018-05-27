@@ -96,6 +96,12 @@ Returns a promise that is resolved when all saving is done.
 
 ## History
 
+### 2.1.0
+
+* disable saving if savingInterval is 0
+* standardjs
+* no gulp
+
 ### 2.0.0
 
 * cross version support
