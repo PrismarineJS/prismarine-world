@@ -63,8 +63,8 @@ describe('saving and loading works', function () {
   it('setBlocks', async () => {
     const world = new World(null, regionPath)
     for (let i = 0; i < 10000; i++) {
-      await world.setBlockType(new Vec3(Math.random() * 16 * size, 256, Math.random() * 16 * size), 0)
+      await world.setBlockType(new Vec3(Math.random() * (16 * size - 1), Math.random() * 255, Math.random() * (16 * size - 1)), 0)
     }
-    await originalWorld.waitSaving()
+    await world.waitSaving()
   })
 })
