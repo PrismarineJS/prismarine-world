@@ -55,12 +55,13 @@ class World extends EventEmitter {
   };
 
   async getColumn (chunkX, chunkZ) {
-    var key = columnKeyXZ(chunkX, chunkZ)
+    await Promise.resolve()
+    const key = columnKeyXZ(chunkX, chunkZ)
 
     if (!this.columns[key]) {
-      var chunk = null
+      let chunk = null
       if (this.anvil != null) {
-        var data = await this.anvil.load(chunkX, chunkZ)
+        const data = await this.anvil.load(chunkX, chunkZ)
         if (data != null) { chunk = data }
       }
       const loaded = chunk != null
@@ -74,7 +75,8 @@ class World extends EventEmitter {
   };
 
   async setColumn (chunkX, chunkZ, chunk, save = true) {
-    var key = columnKeyXZ(chunkX, chunkZ)
+    await Promise.resolve()
+    const key = columnKeyXZ(chunkX, chunkZ)
     this.columnsArray.push({ chunkX: chunkX, chunkZ: chunkZ, column: chunk })
     this.columns[key] = chunk
 
