@@ -1,20 +1,18 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 const flatMap = require('flatmap')
 const range = require('range').range
 const bufferEqual = require('buffer-equal')
 const World = require('../')('1.8')
 const Chunk = require('prismarine-chunk')('1.8')
-const Vec3 = require('vec3')
+const Vec3 = require('vec3').Vec3
 const assert = require('assert')
 const mkdirp = require('mkdirp')
 const rimraf = require('rimraf')
 
 describe('saving and loading works', function () {
-  this.timeout(60 * 1000)
-
   function generateRandomChunk (chunkX, chunkZ) {
-    var chunk = new Chunk()
+    const chunk = new Chunk()
 
     for (var x = 0; x < 16; x++) {
       for (var z = 0; z < 16; z++) {
@@ -28,23 +26,23 @@ describe('saving and loading works', function () {
     return chunk
   }
 
-  let regionPath = 'world/testRegion'
-  before((cb) => {
+  const regionPath = 'world/testRegion'
+  beforeAll((cb) => {
     mkdirp(regionPath, cb)
   })
 
-  after(cb => {
+  afterAll(cb => {
     rimraf(regionPath, cb)
   })
 
   let originalWorld
-  let size = 3
+  const size = 3
 
   it('save the world', async () => {
     originalWorld = new World(generateRandomChunk, regionPath)
     await Promise.all(
-      flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({chunkX, chunkZ})))
-        .map(({chunkX, chunkZ}) => originalWorld.getColumn(chunkX, chunkZ))
+      flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
+        .map(({ chunkX, chunkZ }) => originalWorld.getColumn(chunkX, chunkZ))
     )
     await originalWorld.waitSaving()
   })
@@ -52,13 +50,21 @@ describe('saving and loading works', function () {
   it('load the world correctly', async () => {
     const loadedWorld = new World(null, regionPath)
     await Promise.all(
-      flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({chunkX, chunkZ})))
-        .map(async ({chunkX, chunkZ}) => {
+      flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
+        .map(async ({ chunkX, chunkZ }) => {
           const originalChunk = await originalWorld.getColumn(chunkX, chunkZ)
           const loadedChunk = await loadedWorld.getColumn(chunkX, chunkZ)
-          assert.equal(originalChunk.getBlockType(new Vec3(0, 50, 0)), loadedChunk.getBlockType(new Vec3(0, 50, 0)), 'wrong block type at 0,50,0 of chunk ' + chunkX + ',' + chunkZ)
+          assert.strictEqual(originalChunk.getBlockType(new Vec3(0, 50, 0)), loadedChunk.getBlockType(new Vec3(0, 50, 0)), 'wrong block type at 0,50,0 of chunk ' + chunkX + ',' + chunkZ)
           assert(bufferEqual(originalChunk.dump(), loadedChunk.dump()))
         })
     )
+  })
+
+  it('setBlocks', async () => {
+    const world = new World(null, regionPath)
+    for (let i = 0; i < 10000; i++) {
+      await world.setBlockType(new Vec3(Math.random() * 16 * size, 256, Math.random() * 16 * size), 0)
+    }
+    await originalWorld.waitSaving()
   })
 })

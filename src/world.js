@@ -54,7 +54,7 @@ class World extends EventEmitter {
             chunk.initialize((x, y, z) => inZone(x + offsetX, y - iniPos.y, z + offsetZ) ? iniFunc(x + offsetX, y - iniPos.y, z + offsetZ) : null)
             return this.setColumn(actualChunkX, actualChunkZ, chunk)
           })
-          .then(() => ({chunkX: actualChunkX, chunkZ: actualChunkZ})))
+          .then(() => ({ chunkX: actualChunkX, chunkZ: actualChunkZ })))
       }
     }
     return Promise.all(ps)
@@ -83,7 +83,7 @@ class World extends EventEmitter {
   async setColumn (chunkX, chunkZ, chunk, save = true) {
     await Promise.resolve()
     var key = columnKeyXZ(chunkX, chunkZ)
-    this.columnsArray.push({chunkX: chunkX, chunkZ: chunkZ, column: chunk})
+    this.columnsArray.push({ chunkX: chunkX, chunkZ: chunkZ, column: chunk })
     this.columns[key] = chunk
 
     if (this.anvil && save) { this.queueSaving(chunkX, chunkZ) }
@@ -95,7 +95,7 @@ class World extends EventEmitter {
         this.emit('doneSaving')
         return
       }
-      const {chunkX, chunkZ} = this.savingQueue.pop()
+      const { chunkX, chunkZ } = this.savingQueue.pop()
       this.finishedSaving = Promise.all([this.finishedSaving,
         this.anvil.save(chunkX, chunkZ, this.columns[columnKeyXZ(chunkX, chunkZ)])])
     }, this.savingInterval)
@@ -111,7 +111,7 @@ class World extends EventEmitter {
   }
 
   queueSaving (chunkX, chunkZ) {
-    this.savingQueue.push({chunkX, chunkZ})
+    this.savingQueue.push({ chunkX, chunkZ })
   }
 
   async saveAt (pos) {
