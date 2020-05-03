@@ -50,6 +50,10 @@ Get the [Block](https://github.com/PrismarineJS/prismarine-block) at [pos](https
 
 Set the [Block](https://github.com/PrismarineJS/prismarine-block) at [pos](https://github.com/andrewrk/node-vec3)
 
+#### World.getBlockStateId(pos)
+
+Get the block state at `pos`
+
 #### World.getBlockType(pos)
 
 Get the block type at `pos`
@@ -69,6 +73,10 @@ Get the block sky light at `pos`
 #### World.getBiome(pos)
 
 Get the block biome id at `pos`
+
+#### World.setBlockStateId(pos, stateId)
+
+Set the block state `stateId` at `pos`
 
 #### World.setBlockType(pos, id)
 
@@ -95,6 +103,11 @@ Set the block `biome` id at `pos`
 Returns a promise that is resolved when all saving is done.
 
 ## History
+
+### 2.2.0
+
+* add get/set block state id
+* perf improvement of saving (thanks @Karang)
 
 ### 2.1.0
 

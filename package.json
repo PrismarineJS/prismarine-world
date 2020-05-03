@@ -1,6 +1,6 @@
 {
   "name": "prismarine-world",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "The core implementation of worlds for prismarine",
   "main": "index.js",
   "scripts": {
