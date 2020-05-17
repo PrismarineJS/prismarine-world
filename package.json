@@ -34,7 +34,7 @@
     "buffer-equal": "^1.0.0",
     "flatmap": "0.0.3",
     "minecraft-data": "^2.47.0",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.4",
     "jest": "^26.0.1",
     "range": "0.0.3",
     "rimraf": "^3.0.2",
