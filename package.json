@@ -7,7 +7,9 @@
     "pretest": "npm run lint",
     "lint": "standard",
     "fix": "standard --fix",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -44,6 +46,8 @@
   "dependencies": {
     "event-promise": "0.0.1",
     "prismarine-chunk": "^1.14.0",
-    "prismarine-provider-anvil": "^2.0.0"
-  }
+    "prismarine-provider-anvil": "^2.0.0",
+    "snyk": "^1.321.0"
+  },
+  "snyk": true
 }
