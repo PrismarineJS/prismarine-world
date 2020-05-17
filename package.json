@@ -42,7 +42,7 @@
     "vec3": "~0.1.3"
   },
   "dependencies": {
-    "event-promise": "0.0.1",
+    "event-promise": "1.0.0",
     "prismarine-chunk": "^1.14.0",
     "prismarine-provider-anvil": "^2.0.0"
   }
