@@ -35,7 +35,7 @@
     "flatmap": "0.0.3",
     "minecraft-data": "^2.47.0",
     "mkdirp": "^0.5.1",
-    "jest": "^25.5.3",
+    "jest": "^26.0.1",
     "range": "0.0.3",
     "rimraf": "^2.5.0",
     "standard": "^14.0.1",
