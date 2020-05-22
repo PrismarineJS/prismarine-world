@@ -67,4 +67,12 @@ describe('saving and loading works', function () {
     }
     await world.waitSaving()
   })
+
+  it('initialize', async () => {
+    const world = new World(null, regionPath)
+    await world.initialize((x, y, z) => {
+      return 0
+    }, size * 16, size * 16, 256, new Vec3(0, 0, 0))
+    await world.waitSaving()
+  })
 })
