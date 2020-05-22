@@ -1,7 +1,5 @@
 /* eslint-env jest */
 
-const flatMap = require('flatmap')
-const range = require('range').range
 const bufferEqual = require('buffer-equal')
 const World = require('../')('1.8')
 const Chunk = require('prismarine-chunk')('1.8')
@@ -40,37 +38,36 @@ describe('saving and loading works', function () {
 
   it('save the world', async () => {
     originalWorld = new World(generateRandomChunk, regionPath)
-    await Promise.all(
-      flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
-        .map(({ chunkX, chunkZ }) => originalWorld.getColumn(chunkX, chunkZ))
-    )
+    await originalWorld.loadColumns(0, 0, size - 1, size - 1)
     await originalWorld.waitSaving()
   })
 
   it('load the world correctly', async () => {
     const loadedWorld = new World(null, regionPath)
-    await Promise.all(
-      flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
-        .map(async ({ chunkX, chunkZ }) => {
-          const originalChunk = await originalWorld.getColumn(chunkX, chunkZ)
-          const loadedChunk = await loadedWorld.getColumn(chunkX, chunkZ)
-          assert.strictEqual(originalChunk.getBlockType(new Vec3(0, 50, 0)), loadedChunk.getBlockType(new Vec3(0, 50, 0)), 'wrong block type at 0,50,0 of chunk ' + chunkX + ',' + chunkZ)
-          assert(bufferEqual(originalChunk.dump(), loadedChunk.dump()))
-        })
-    )
+    await loadedWorld.loadColumns(0, 0, size - 1, size - 1)
+    for (let chunkZ = 0; chunkZ < size; chunkZ++) {
+      for (let chunkX = 0; chunkX < size; chunkX++) {
+        const originalChunk = originalWorld.getColumn(chunkX, chunkZ)
+        const loadedChunk = loadedWorld.getColumn(chunkX, chunkZ)
+        assert.strictEqual(originalChunk.getBlockType(new Vec3(0, 50, 0)), loadedChunk.getBlockType(new Vec3(0, 50, 0)), 'wrong block type at 0,50,0 of chunk ' + chunkX + ',' + chunkZ)
+        assert(bufferEqual(originalChunk.dump(), loadedChunk.dump()))
+      }
+    }
   })
 
   it('setBlocks', async () => {
     const world = new World(null, regionPath)
+    await world.loadColumns(0, 0, size - 1, size - 1)
     for (let i = 0; i < 10000; i++) {
-      await world.setBlockType(new Vec3(Math.random() * (16 * size - 1), Math.random() * 255, Math.random() * (16 * size - 1)), 0)
+      world.setBlockType(new Vec3(Math.random() * (16 * size - 1), Math.random() * 255, Math.random() * (16 * size - 1)), 0)
     }
     await world.waitSaving()
   })
 
   it('initialize', async () => {
     const world = new World(null, regionPath)
-    await world.initialize((x, y, z) => {
+    await world.loadColumns(0, 0, size - 1, size - 1)
+    world.initialize((x, y, z) => {
       return 0
     }, size * 16, size * 16, 256, new Vec3(0, 0, 0))
     await world.waitSaving()

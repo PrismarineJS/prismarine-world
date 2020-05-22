@@ -1,7 +1,6 @@
 const Vec3 = require('vec3').Vec3
 let Anvil
 const EventEmitter = require('events').EventEmitter
-const once = require('event-promise')
 
 function columnKeyXZ (chunkX, chunkZ) {
   return chunkX + ',' + chunkZ
@@ -33,7 +32,6 @@ class World extends EventEmitter {
       if (y >= height || y < 0) { return false }
       return true
     }
-    const ps = []
     const iniPosInChunk = posInChunk(iniPos)
     const chunkLength = Math.ceil((length + iniPosInChunk.z) / 16)
     const chunkWidth = Math.ceil((width + iniPosInChunk.x) / 16)
@@ -41,49 +39,59 @@ class World extends EventEmitter {
       const actualChunkZ = chunkZ + Math.floor(iniPos.z / 16)
       for (let chunkX = 0; chunkX < chunkWidth; chunkX++) {
         const actualChunkX = chunkX + Math.floor(iniPos.x / 16)
-        ps.push(this.getColumn(actualChunkX, actualChunkZ)
-          .then(chunk => {
-            const offsetX = chunkX * 16 - iniPosInChunk.x
-            const offsetZ = chunkZ * 16 - iniPosInChunk.z
-            chunk.initialize((x, y, z) => inZone(x + offsetX, y - iniPos.y, z + offsetZ) ? iniFunc(x + offsetX, y - iniPos.y, z + offsetZ) : null)
-            return this.setColumn(actualChunkX, actualChunkZ, chunk)
-          })
-          .then(() => ({ chunkX: actualChunkX, chunkZ: actualChunkZ })))
+        const chunk = this.getColumn(actualChunkX, actualChunkZ)
+        const offsetX = chunkX * 16 - iniPosInChunk.x
+        const offsetZ = chunkZ * 16 - iniPosInChunk.z
+        chunk.initialize((x, y, z) => inZone(x + offsetX, y - iniPos.y, z + offsetZ) ? iniFunc(x + offsetX, y - iniPos.y, z + offsetZ) : null)
+        this.setColumn(actualChunkX, actualChunkZ, chunk)
+      }
+    }
+  };
+
+  // Load all columns in the rectangular area (in column coordinates)
+  async loadColumns (x0, z0, x1, z1) {
+    const ps = []
+    for (let z = z0; z <= z1; z++) {
+      for (let x = x0; x <= x1; x++) {
+        ps.push(this.loadColumn(x, z))
       }
     }
     return Promise.all(ps)
-  };
+  }
 
-  async getColumn (chunkX, chunkZ) {
-    await Promise.resolve()
+  // Load a single column from storage or generate it
+  async loadColumn (chunkX, chunkZ) {
     const key = columnKeyXZ(chunkX, chunkZ)
+    if (this.columns[key]) return // already loaded
 
-    if (!this.columns[key]) {
-      let chunk = null
-      if (this.anvil != null) {
-        const data = await this.anvil.load(chunkX, chunkZ)
-        if (data != null) { chunk = data }
-      }
-      const loaded = chunk != null
-      if (!loaded && this.chunkGenerator) {
-        chunk = this.chunkGenerator(chunkX, chunkZ)
-      }
-      if (chunk != null) { await this.setColumn(chunkX, chunkZ, chunk, !loaded) }
+    let chunk = null
+    if (this.anvil != null) {
+      const data = await this.anvil.load(chunkX, chunkZ)
+      if (data != null) { chunk = data }
     }
 
-    return this.columns[key]
-  };
+    const loaded = chunk != null
+    if (!loaded && this.chunkGenerator) {
+      chunk = this.chunkGenerator(chunkX, chunkZ)
+    }
 
-  async setColumn (chunkX, chunkZ, chunk, save = true) {
-    await Promise.resolve()
+    if (chunk != null) { this.setColumn(chunkX, chunkZ, chunk, !loaded) }
+  }
+
+  getColumn (chunkX, chunkZ) {
+    const key = columnKeyXZ(chunkX, chunkZ)
+    return this.columns[key]
+  }
+
+  setColumn (chunkX, chunkZ, chunk, save = true) {
     const key = columnKeyXZ(chunkX, chunkZ)
     this.columnsArray.push({ chunkX: chunkX, chunkZ: chunkZ, column: chunk })
     this.columns[key] = chunk
 
     if (this.anvil && save) { this.queueSaving(chunkX, chunkZ) }
-  };
+  }
 
-  async saveNow () {
+  saveNow () {
     if (this.savingQueue.size === 0) {
       return
     }
@@ -99,15 +107,12 @@ class World extends EventEmitter {
 
   startSaving () {
     this.savingInt = setInterval(async () => {
-      await this.saveNow()
+      this.saveNow()
     }, this.savingInterval)
   }
 
   async waitSaving () {
-    await this.saveNow()
-    if (this.savingQueue.size > 0) {
-      await once(this, 'doneSaving')
-    }
+    this.saveNow()
     await this.finishedSaving
   }
 
@@ -119,9 +124,9 @@ class World extends EventEmitter {
     this.savingQueue.set(columnKeyXZ(chunkX, chunkZ), { chunkX, chunkZ })
   }
 
-  async saveAt (pos) {
-    var chunkX = Math.floor(pos.x / 16)
-    var chunkZ = Math.floor(pos.z / 16)
+  saveAt (pos) {
+    const chunkX = Math.floor(pos.x / 16)
+    const chunkZ = Math.floor(pos.z / 16)
     if (this.anvil) { this.queueSaving(chunkX, chunkZ) }
   }
 
@@ -129,72 +134,102 @@ class World extends EventEmitter {
     return this.columnsArray
   }
 
-  async getColumnAt (pos) {
-    var chunkX = Math.floor(pos.x / 16)
-    var chunkZ = Math.floor(pos.z / 16)
+  getColumnAt (pos) {
+    const chunkX = Math.floor(pos.x / 16)
+    const chunkZ = Math.floor(pos.z / 16)
     return this.getColumn(chunkX, chunkZ)
   }
 
-  async setBlock (pos, block) {
-    (await this.getColumnAt(pos)).setBlock(posInChunk(pos), block)
+  // Block accessors:
+
+  getBlock (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return null
+    return chunk.getBlock(posInChunk(pos))
+  }
+
+  getBlockStateId (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return 0
+    return chunk.getBlockStateId(posInChunk(pos))
+  }
+
+  getBlockType (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return 0
+    return chunk.getBlockType(posInChunk(pos))
+  }
+
+  getBlockData (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return 0
+    return chunk.getBlockData(posInChunk(pos))
+  }
+
+  getBlockLight (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return 0
+    return chunk.getBlockLight(posInChunk(pos))
+  }
+
+  getSkyLight (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return 0
+    return chunk.getSkyLight(posInChunk(pos))
+  }
+
+  getBiome (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return 0
+    return chunk.getBiome(posInChunk(pos))
+  }
+
+  setBlock (pos, block) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.setBlock(posInChunk(pos), block)
     this.saveAt(pos)
   }
 
-  async getBlock (pos) {
-    return (await this.getColumnAt(pos)).getBlock(posInChunk(pos))
-  }
-
-  async getBlockStateId (pos) {
-    return (await this.getColumnAt(pos)).getBlockStateId(posInChunk(pos))
-  }
-
-  async getBlockType (pos) {
-    return (await this.getColumnAt(pos)).getBlockType(posInChunk(pos))
-  }
-
-  async getBlockData (pos) {
-    return (await this.getColumnAt(pos)).getBlockData(posInChunk(pos))
-  }
-
-  async getBlockLight (pos) {
-    return (await this.getColumnAt(pos)).getBlockLight(posInChunk(pos))
-  }
-
-  async getSkyLight (pos) {
-    return (await this.getColumnAt(pos)).getSkyLight(posInChunk(pos))
-  }
-
-  async getBiome (pos) {
-    return (await this.getColumnAt(pos)).getBiome(posInChunk(pos))
-  }
-
-  async setBlockStateId (pos, stateId) {
-    (await this.getColumnAt(pos)).setBlockStateId(posInChunk(pos), stateId)
+  setBlockStateId (pos, stateId) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.setBlockStateId(posInChunk(pos), stateId)
     this.saveAt(pos)
   }
 
-  async setBlockType (pos, blockType) {
-    (await this.getColumnAt(pos)).setBlockType(posInChunk(pos), blockType)
+  setBlockType (pos, blockType) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.setBlockType(posInChunk(pos), blockType)
     this.saveAt(pos)
   }
 
-  async setBlockData (pos, data) {
-    (await this.getColumnAt(pos)).setBlockData(posInChunk(pos), data)
+  setBlockData (pos, data) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.setBlockData(posInChunk(pos), data)
     this.saveAt(pos)
   }
 
-  async setBlockLight (pos, light) {
-    (await this.getColumnAt(pos)).setBlockLight(posInChunk(pos), light)
+  setBlockLight (pos, light) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.setBlockLight(posInChunk(pos), light)
     this.saveAt(pos)
   }
 
-  async setSkyLight (pos, light) {
-    (await this.getColumnAt(pos)).setSkyLight(posInChunk(pos), light)
+  setSkyLight (pos, light) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.setSkyLight(posInChunk(pos), light)
     this.saveAt(pos)
   }
 
-  async setBiome (pos, biome) {
-    (await this.getColumnAt(pos)).setBiome(posInChunk(pos), biome)
+  setBiome (pos, biome) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.setBiome(posInChunk(pos), biome)
     this.saveAt(pos)
   }
 }
