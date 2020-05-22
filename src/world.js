@@ -78,6 +78,16 @@ class World extends EventEmitter {
     if (chunk != null) { this.setColumn(chunkX, chunkZ, chunk, !loaded) }
   }
 
+  async unloadColumn (chunkX, chunkZ, save = true) {
+    const key = columnKeyXZ(chunkX, chunkZ)
+    if (!this.columns[key]) return // already unloaded
+    if (this.anvil && save) {
+      this.queueSaving(chunkX, chunkZ)
+      await this.waitSaving()
+    }
+    delete this.columns[key]
+  }
+
   getColumn (chunkX, chunkZ) {
     const key = columnKeyXZ(chunkX, chunkZ)
     return this.columns[key]
