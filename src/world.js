@@ -54,7 +54,12 @@ class World extends EventEmitter {
       }
     }
     return Promise.all(ps)
-  };
+  }
+
+  getLoadedColumn (chunkX, chunkZ) {
+    const key = columnKeyXZ(chunkX, chunkZ)
+    return this.columns[key]
+  }
 
   async getColumn (chunkX, chunkZ) {
     await Promise.resolve()
@@ -74,16 +79,20 @@ class World extends EventEmitter {
     }
 
     return this.columns[key]
-  };
+  }
 
-  async setColumn (chunkX, chunkZ, chunk, save = true) {
-    await Promise.resolve()
+  setLoadedColumn (chunkX, chunkZ, chunk, save = true) {
     const key = columnKeyXZ(chunkX, chunkZ)
     this.columnsArray.push({ chunkX: chunkX, chunkZ: chunkZ, column: chunk })
     this.columns[key] = chunk
 
     if (this.anvil && save) { this.queueSaving(chunkX, chunkZ) }
-  };
+  }
+
+  async setColumn (chunkX, chunkZ, chunk, save = true) {
+    await Promise.resolve()
+    this.setLoadedColumn(chunkX, chunkZ, chunk, save)
+  }
 
   async saveNow () {
     if (this.savingQueue.size === 0) {
@@ -121,7 +130,7 @@ class World extends EventEmitter {
     this.savingQueue.set(columnKeyXZ(chunkX, chunkZ), { chunkX, chunkZ })
   }
 
-  async saveAt (pos) {
+  saveAt (pos) {
     var chunkX = Math.floor(pos.x / 16)
     var chunkZ = Math.floor(pos.z / 16)
     if (this.anvil) { this.queueSaving(chunkX, chunkZ) }
@@ -129,6 +138,12 @@ class World extends EventEmitter {
 
   getColumns () {
     return this.columnsArray
+  }
+
+  getLoadedColumnAt (pos) {
+    const chunkX = Math.floor(pos.x / 16)
+    const chunkZ = Math.floor(pos.z / 16)
+    return this.getLoadedColumn(chunkX, chunkZ)
   }
 
   async getColumnAt (pos) {

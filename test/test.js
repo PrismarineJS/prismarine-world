@@ -101,9 +101,9 @@ describe('Synchronous saving and loading works', function () {
     originalWorld = new World(generateRandomChunk, regionPath)
     await Promise.all(
       flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
-        .map(({ chunkX, chunkZ }) => originalWorld.sync.loadColumn(chunkX, chunkZ))
+        .map(({ chunkX, chunkZ }) => originalWorld.getColumn(chunkX, chunkZ))
     )
-    await originalWorld.sync.waitSaving()
+    await originalWorld.waitSaving()
   })
 
   it('load the world correctly', async () => {
@@ -111,7 +111,7 @@ describe('Synchronous saving and loading works', function () {
     await Promise.all(
       flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
         .map(async ({ chunkX, chunkZ }) => {
-          await loadedWorld.sync.loadColumn(chunkX, chunkZ)
+          await loadedWorld.getColumn(chunkX, chunkZ)
           const originalChunk = originalWorld.sync.getColumn(chunkX, chunkZ)
           const loadedChunk = loadedWorld.sync.getColumn(chunkX, chunkZ)
           assert.strictEqual(originalChunk.getBlockType(new Vec3(0, 50, 0)), loadedChunk.getBlockType(new Vec3(0, 50, 0)), 'wrong block type at 0,50,0 of chunk ' + chunkX + ',' + chunkZ)
