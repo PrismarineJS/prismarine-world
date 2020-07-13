@@ -39,10 +39,10 @@ multi player clients)
 
 ### World
 
-#### World([generateChunk,[regionDir]],[savingInterval])
+#### World([generateChunk,[storageProvider]],[savingInterval])
 
 Create a world instance, takes an optional `generateChunk(chunkX, chunkZ)` function that will get called when a chunk at 
-`chunkX` and `chunkZ` need to be generated. Takes a second optional arguments : `regionDir` containing the anvil regions.
+`chunkX` and `chunkZ` need to be generated. Takes a second optional arguments : `storageProvider` containing the regions.
 If provided, prismarine-world will first try to load the map from these regions, and then try to generate the world if 
 the chunk isn't saved. `savingInterval` default to 50ms.
 
