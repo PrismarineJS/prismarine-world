@@ -1,6 +1,5 @@
 const Vec3 = require('vec3').Vec3
 const WorldSync = require('./worldsync.js')
-let Anvil
 const EventEmitter = require('events').EventEmitter
 const once = require('event-promise')
 
@@ -13,17 +12,17 @@ function posInChunk (pos) {
 }
 
 class World extends EventEmitter {
-  constructor (chunkGenerator, regionFolder, savingInterval = 1000) {
+  constructor (chunkGenerator, storageProvider = null, savingInterval = 1000) {
     super()
     this.savingQueue = new Map()
     this.finishedSaving = Promise.resolve()
     this.columns = {}
     this.columnsArray = []
     this.chunkGenerator = chunkGenerator
-    this.anvil = regionFolder ? new Anvil(regionFolder) : null
+    this.storageProvider = storageProvider
     this.savingInterval = savingInterval
     this.sync = new WorldSync(this)
-    if (regionFolder && savingInterval !== 0) this.startSaving()
+    if (storageProvider && savingInterval !== 0) this.startSaving()
   }
 
   initialize (iniFunc, length, width, height = 256, iniPos = new Vec3(0, 0, 0)) {
@@ -67,8 +66,8 @@ class World extends EventEmitter {
 
     if (!this.columns[key]) {
       let chunk = null
-      if (this.anvil != null) {
-        const data = await this.anvil.load(chunkX, chunkZ)
+      if (this.storageProvider != null) {
+        const data = await this.storageProvider.load(chunkX, chunkZ)
         if (data != null) { chunk = data }
       }
       const loaded = chunk != null
@@ -86,7 +85,7 @@ class World extends EventEmitter {
     this.columnsArray.push({ chunkX: chunkX, chunkZ: chunkZ, column: chunk })
     this.columns[key] = chunk
 
-    if (this.anvil && save) { this.queueSaving(chunkX, chunkZ) }
+    if (this.storageProvider && save) { this.queueSaving(chunkX, chunkZ) }
   }
 
   async setColumn (chunkX, chunkZ, chunk, save = true) {
@@ -102,7 +101,7 @@ class World extends EventEmitter {
     // interval. The set structure is maintaining the order of insertion
     for (const [key, { chunkX, chunkZ }] of this.savingQueue.entries()) {
       this.finishedSaving = Promise.all([this.finishedSaving,
-        this.anvil.save(chunkX, chunkZ, this.columns[key])])
+        this.storageProvider.save(chunkX, chunkZ, this.columns[key])])
     }
     this.savingQueue.clear()
     this.emit('doneSaving')
@@ -133,7 +132,7 @@ class World extends EventEmitter {
   saveAt (pos) {
     var chunkX = Math.floor(pos.x / 16)
     var chunkZ = Math.floor(pos.z / 16)
-    if (this.anvil) { this.queueSaving(chunkX, chunkZ) }
+    if (this.storageProvider) { this.queueSaving(chunkX, chunkZ) }
   }
 
   getColumns () {
@@ -217,7 +216,6 @@ class World extends EventEmitter {
 }
 
 function loader (mcVersion) {
-  Anvil = require('prismarine-provider-anvil').Anvil(mcVersion)
   return World
 }
 

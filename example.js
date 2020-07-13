@@ -1,14 +1,15 @@
-var World = require('./')('1.8')
-var Chunk = require('prismarine-chunk')('1.8')
-var Vec3 = require('vec3')
+const World = require('./')('1.8')
+const Chunk = require('prismarine-chunk')('1.8')
+const Anvil = require('prismarine-provider-anvil').Anvil('1.8')
+const Vec3 = require('vec3')
 
 function generateSimpleChunk (chunkX, chunkZ) {
-  var chunk = new Chunk()
+  const chunk = new Chunk()
 
-  for (var x = 0; x < 16; x++) {
-    for (var z = 0; z < 16; z++) {
+  for (let x = 0; x < 16; x++) {
+    for (let z = 0; z < 16; z++) {
       chunk.setBlockType(new Vec3(x, 50, z), 2)
-      for (var y = 0; y < 256; y++) {
+      for (let y = 0; y < 256; y++) {
         chunk.setSkyLight(new Vec3(x, y, z), 15)
       }
     }
@@ -17,15 +18,15 @@ function generateSimpleChunk (chunkX, chunkZ) {
   return chunk
 }
 
-if (process.argv.length > 5) {
+if (process.argv.length !== 4) {
   console.log('Usage : node example.js <regionPath> <noGeneration>')
   process.exit(1)
 }
 
-var regionPath = process.argv[2]
-var noGeneration = process.argv[3] === 'yes'
+const regionPath = process.argv[2]
+const noGeneration = process.argv[3] === 'yes'
 
-var world2 = new World(noGeneration ? null : generateSimpleChunk, regionPath)
+const world2 = new World(noGeneration ? null : generateSimpleChunk, new Anvil(regionPath))
 
 world2
   .getBlock(new Vec3(3, 50, 3))

@@ -9,6 +9,7 @@ const Vec3 = require('vec3').Vec3
 const assert = require('assert')
 const mkdirp = require('mkdirp')
 const rimraf = require('rimraf')
+const Anvil = require('prismarine-provider-anvil').Anvil('1.8')
 
 describe('saving and loading works', function () {
   function generateRandomChunk (chunkX, chunkZ) {
@@ -39,7 +40,7 @@ describe('saving and loading works', function () {
   const size = 3
 
   it('save the world', async () => {
-    originalWorld = new World(generateRandomChunk, regionPath)
+    originalWorld = new World(generateRandomChunk, new Anvil(regionPath))
     await Promise.all(
       flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
         .map(({ chunkX, chunkZ }) => originalWorld.getColumn(chunkX, chunkZ))
@@ -48,7 +49,7 @@ describe('saving and loading works', function () {
   })
 
   it('load the world correctly', async () => {
-    const loadedWorld = new World(null, regionPath)
+    const loadedWorld = new World(null, new Anvil(regionPath))
     await Promise.all(
       flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
         .map(async ({ chunkX, chunkZ }) => {
@@ -61,7 +62,7 @@ describe('saving and loading works', function () {
   })
 
   it('setBlocks', async () => {
-    const world = new World(null, regionPath)
+    const world = new World(null, new Anvil(regionPath))
     for (let i = 0; i < 10000; i++) {
       await world.setBlockType(new Vec3(Math.random() * (16 * size - 1), Math.random() * 255, Math.random() * (16 * size - 1)), 0)
     }
@@ -98,7 +99,7 @@ describe('Synchronous saving and loading works', function () {
   const size = 3
 
   it('saving the world', async () => {
-    originalWorld = new World(generateRandomChunk, regionPath)
+    originalWorld = new World(generateRandomChunk, new Anvil(regionPath))
     await Promise.all(
       flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
         .map(({ chunkX, chunkZ }) => originalWorld.getColumn(chunkX, chunkZ))
@@ -107,7 +108,7 @@ describe('Synchronous saving and loading works', function () {
   })
 
   it('load the world correctly', async () => {
-    const loadedWorld = new World(null, regionPath)
+    const loadedWorld = new World(null, new Anvil(regionPath))
     await Promise.all(
       flatMap(range(0, size), (chunkX) => range(0, size).map(chunkZ => ({ chunkX, chunkZ })))
         .map(async ({ chunkX, chunkZ }) => {
@@ -121,7 +122,7 @@ describe('Synchronous saving and loading works', function () {
   })
 
   it('setBlocks', async () => {
-    const world = new World(null, regionPath)
+    const world = new World(null, new Anvil(regionPath))
     for (let i = 0; i < 10000; i++) {
       world.sync.setBlockType(new Vec3(Math.random() * (16 * size - 1), Math.random() * 255, Math.random() * (16 * size - 1)), 0)
     }
