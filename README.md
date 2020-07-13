@@ -213,6 +213,10 @@ Set the block `biome` id at `pos`
 
 ## History
 
+### 2.3.0
+
+* add .sync
+
 ### 2.2.0
 
 * add get/set block state id
