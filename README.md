@@ -219,6 +219,10 @@ Set the block `biome` id at `pos`
 
 ## History
 
+### 3.0.0
+
+* BREAKING: regionFolder is now a provider (for example an Anvil instance)
+
 ### 2.3.0
 
 * add .sync
