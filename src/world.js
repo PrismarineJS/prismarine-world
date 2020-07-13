@@ -1,4 +1,5 @@
 const Vec3 = require('vec3').Vec3
+const WorldSync = require('./worldsync.js')
 let Anvil
 const EventEmitter = require('events').EventEmitter
 const once = require('event-promise')
@@ -21,6 +22,7 @@ class World extends EventEmitter {
     this.chunkGenerator = chunkGenerator
     this.anvil = regionFolder ? new Anvil(regionFolder) : null
     this.savingInterval = savingInterval
+    this.sync = new WorldSync(this)
     if (regionFolder && savingInterval !== 0) this.startSaving()
   }
 
@@ -52,7 +54,12 @@ class World extends EventEmitter {
       }
     }
     return Promise.all(ps)
-  };
+  }
+
+  getLoadedColumn (chunkX, chunkZ) {
+    const key = columnKeyXZ(chunkX, chunkZ)
+    return this.columns[key]
+  }
 
   async getColumn (chunkX, chunkZ) {
     await Promise.resolve()
@@ -72,34 +79,43 @@ class World extends EventEmitter {
     }
 
     return this.columns[key]
-  };
+  }
 
-  async setColumn (chunkX, chunkZ, chunk, save = true) {
-    await Promise.resolve()
+  setLoadedColumn (chunkX, chunkZ, chunk, save = true) {
     const key = columnKeyXZ(chunkX, chunkZ)
     this.columnsArray.push({ chunkX: chunkX, chunkZ: chunkZ, column: chunk })
     this.columns[key] = chunk
 
     if (this.anvil && save) { this.queueSaving(chunkX, chunkZ) }
-  };
+  }
+
+  async setColumn (chunkX, chunkZ, chunk, save = true) {
+    await Promise.resolve()
+    this.setLoadedColumn(chunkX, chunkZ, chunk, save)
+  }
+
+  async saveNow () {
+    if (this.savingQueue.size === 0) {
+      return
+    }
+    // We could set a limit on the number of chunks to save at each
+    // interval. The set structure is maintaining the order of insertion
+    for (const [key, { chunkX, chunkZ }] of this.savingQueue.entries()) {
+      this.finishedSaving = Promise.all([this.finishedSaving,
+        this.anvil.save(chunkX, chunkZ, this.columns[key])])
+    }
+    this.savingQueue.clear()
+    this.emit('doneSaving')
+  }
 
   startSaving () {
     this.savingInt = setInterval(async () => {
-      if (this.savingQueue.size === 0) {
-        return
-      }
-      // We could set a limit on the number of chunks to save at each
-      // interval. The set structure is maintaining the order of insertion
-      for (const [key, { chunkX, chunkZ }] of this.savingQueue.entries()) {
-        this.finishedSaving = Promise.all([this.finishedSaving,
-          this.anvil.save(chunkX, chunkZ, this.columns[key])])
-      }
-      this.savingQueue.clear()
-      this.emit('doneSaving')
+      await this.saveNow()
     }, this.savingInterval)
   }
 
   async waitSaving () {
+    await this.saveNow()
     if (this.savingQueue.size > 0) {
       await once(this, 'doneSaving')
     }
@@ -114,7 +130,7 @@ class World extends EventEmitter {
     this.savingQueue.set(columnKeyXZ(chunkX, chunkZ), { chunkX, chunkZ })
   }
 
-  async saveAt (pos) {
+  saveAt (pos) {
     var chunkX = Math.floor(pos.x / 16)
     var chunkZ = Math.floor(pos.z / 16)
     if (this.anvil) { this.queueSaving(chunkX, chunkZ) }
@@ -122,6 +138,12 @@ class World extends EventEmitter {
 
   getColumns () {
     return this.columnsArray
+  }
+
+  getLoadedColumnAt (pos) {
+    const chunkX = Math.floor(pos.x / 16)
+    const chunkZ = Math.floor(pos.z / 16)
+    return this.getLoadedColumn(chunkX, chunkZ)
   }
 
   async getColumnAt (pos) {
