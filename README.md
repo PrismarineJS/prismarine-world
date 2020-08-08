@@ -226,6 +226,10 @@ Set the block `biome` id at `pos`
 
 ## History
 
+### 3.1.0
+
+* implement unload column
+
 ### 3.0.0
 
 * BREAKING: regionFolder is now a provider (for example an Anvil instance)
