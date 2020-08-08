@@ -17,7 +17,6 @@ class World extends EventEmitter {
     this.savingQueue = new Map()
     this.finishedSaving = Promise.resolve()
     this.columns = {}
-    this.columnsArray = []
     this.chunkGenerator = chunkGenerator
     this.storageProvider = storageProvider
     this.savingInterval = savingInterval
@@ -82,7 +81,6 @@ class World extends EventEmitter {
 
   setLoadedColumn (chunkX, chunkZ, chunk, save = true) {
     const key = columnKeyXZ(chunkX, chunkZ)
-    this.columnsArray.push({ chunkX: chunkX, chunkZ: chunkZ, column: chunk })
     this.columns[key] = chunk
 
     if (this.storageProvider && save) { this.queueSaving(chunkX, chunkZ) }
@@ -91,6 +89,11 @@ class World extends EventEmitter {
   async setColumn (chunkX, chunkZ, chunk, save = true) {
     await Promise.resolve()
     this.setLoadedColumn(chunkX, chunkZ, chunk, save)
+  }
+
+  unloadColumn (chunkX, chunkZ) {
+    const key = columnKeyXZ(chunkX, chunkZ)
+    delete this.columns[key]
   }
 
   async saveNow () {
@@ -136,7 +139,14 @@ class World extends EventEmitter {
   }
 
   getColumns () {
-    return this.columnsArray
+    return Object.items(this.columns).map(([key, column]) => {
+      const parts = key.split(',')
+      return {
+        chunkX: parts[0],
+        chunkZ: parts[1],
+        column
+      }
+    })
   }
 
   getLoadedColumnAt (pos) {

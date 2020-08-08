@@ -60,6 +60,9 @@ Returns a promise containing an array of `{chunkX,chunkZ}`
 
 Return all loaded columns
 
+#### World.unloadColumn(chunkX,chunkZ)
+
+Unload column from memory
 
 All the following methods are async and return a promise.
 
@@ -152,6 +155,10 @@ This works only on loaded columns.
 Return all loaded columns
 
 All the following methods are sync.
+
+#### World.sync.unloadColumn(chunkX,chunkZ)
+
+Unload column from memory
 
 #### World.sync.setColumn(chunkX,chunkZ,chunk)
 

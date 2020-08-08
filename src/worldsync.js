@@ -36,8 +36,12 @@ class WorldSync extends EventEmitter {
     }
   }
 
+  unloadColumn (chunkX, chunkZ) {
+    this.async.unloadColumn(chunkX, chunkZ)
+  }
+
   getColumns () {
-    return this.sync.getColumns()
+    return this.async.getColumns()
   }
 
   getColumn (chunkX, chunkZ) {
