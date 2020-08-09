@@ -17,6 +17,7 @@ See [example.js](example.js)
 * [prismarine-viewer](https://github.com/PrismarineJS/prismarine-viewer) to view a world
 * [mineflayer](https://github.com/PrismarineJS/mineflayer) to use a world in a mc client
 * [flying-squid](https://github.com/PrismarineJS/flying-squid) to serve a world from a mc server
+* [schematic-to-world](https://github.com/rom1504/schematic-to-world) to add a mc schematic to a world
 
 ## API
 
