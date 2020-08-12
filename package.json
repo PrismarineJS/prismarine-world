@@ -40,7 +40,8 @@
     "rimraf": "^3.0.2",
     "standard": "^14.0.1",
     "prismarine-provider-anvil": "^2.0.0",
-    "prismarine-chunk": "^1.14.0"
+    "prismarine-chunk": "^1.14.0",
+    "prismarine-provider-raw": "^1.0.1"
   },
   "dependencies": {
     "event-promise": "0.0.1",

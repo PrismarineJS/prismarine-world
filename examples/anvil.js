@@ -1,6 +1,6 @@
-const World = require('./')('1.8')
-const Chunk = require('prismarine-chunk')('1.8')
-const Anvil = require('prismarine-provider-anvil').Anvil('1.8')
+const World = require('../index')('1.16')
+const Chunk = require('prismarine-chunk')('1.16')
+const Anvil = require('prismarine-provider-anvil').Anvil('1.16')
 const Vec3 = require('vec3')
 
 function generateSimpleChunk (chunkX, chunkZ) {
@@ -19,7 +19,7 @@ function generateSimpleChunk (chunkX, chunkZ) {
 }
 
 if (process.argv.length !== 4) {
-  console.log('Usage : node example.js <regionPath> <noGeneration>')
+  console.log('Usage : node anvil.js <regionPath> <noGeneration>')
   process.exit(1)
 }
 
