@@ -19,6 +19,11 @@ See [example.js](example.js)
 * [flying-squid](https://github.com/PrismarineJS/flying-squid) to serve a world from a mc server
 * [schematic-to-world](https://github.com/rom1504/schematic-to-world) to add a mc schematic to a world
 
+## Available Storage Providers
+
+* [prismarine-provider-anvil](https://github.com/PrismarineJS/prismarine-provider-anvil) Anvil (Minecraft's world format) based storage
+* [prismarine-provider-raw](https://github.com/PrismarineJS/prismarine-provider-raw) Prismarine-chunk based raw storage
+
 ## API
 
 The API is split in 2 :
