@@ -10,7 +10,7 @@
 
 ## Usage
 
-See [example.js](example.js)
+See [anvil.js](examples/anvil.js)
 
 ## Related packages
 
