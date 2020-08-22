@@ -139,7 +139,7 @@ class World extends EventEmitter {
   }
 
   getColumns () {
-    return Object.items(this.columns).map(([key, column]) => {
+    return Object.values(this.columns).map(([key, column]) => {
       const parts = key.split(',')
       return {
         chunkX: parts[0],
