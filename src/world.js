@@ -63,6 +63,7 @@ class World extends EventEmitter {
     await Promise.resolve()
     const key = columnKeyXZ(chunkX, chunkZ)
 
+    if (typeof this.loadingColumns !== 'object') this.loadingColumns = []
     if (!this.columns[key]) {
       let chunk = null
       if (this.storageProvider != null) {
@@ -71,10 +72,28 @@ class World extends EventEmitter {
       }
       const loaded = chunk != null
       if (!loaded && this.chunkGenerator) {
-        chunk = this.chunkGenerator(chunkX, chunkZ)
+      	if (this.loadingColumns.includes(key)) {
+      		var abstract = this
+      		return await new Promise((resolve, reject) => {
+      			var iv = setInterval(() => {
+      				if (!abstract.loadingColumns.includes(key)) {
+      					clearInterval(iv)
+      					resolve(abstract.columns[key])
+      				}
+      			}, 1)
+      		})
+      	} else {
+        	chunk = this.chunkGenerator(chunkX, chunkZ)
+        }
       }
-      if (typeof chunk.then === 'function') chunk = (await chunk)
+      if (typeof chunk.then === 'function') {
+      	this.loadingColumns.push(key)
+      	chunk = (await chunk)
+      }
       if (chunk != null) { await this.setColumn(chunkX, chunkZ, chunk, !loaded) }
+      if (this.loadingColumns.includes(key)) {
+      	this.loadingColumns.splice(this.loadingColumns.indexOf(key), 1)
+      }
     }
 
     return this.columns[key]
