@@ -73,7 +73,7 @@ class World extends EventEmitter {
       if (!loaded && this.chunkGenerator) {
         chunk = this.chunkGenerator(chunkX, chunkZ)
       }
-      if (typeof chunk.then == "function") chunk = (await chunk);
+      if (typeof chunk.then === 'function') chunk = (await chunk)
       if (chunk != null) { await this.setColumn(chunkX, chunkZ, chunk, !loaded) }
     }
 
