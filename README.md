@@ -232,6 +232,10 @@ Set the block `biome` id at `pos`
 
 ## History
 
+### 3.1.1
+
+* fix world.sync.getChunks()
+
 ### 3.1.0
 
 * implement unload column
