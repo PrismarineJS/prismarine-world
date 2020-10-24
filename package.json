@@ -33,15 +33,15 @@
   "devDependencies": {
     "buffer-equal": "^1.0.0",
     "flatmap": "0.0.3",
+    "jest": "^26.0.1",
     "minecraft-data": "^2.47.0",
     "mkdirp": "^0.5.1",
-    "jest": "^26.0.1",
+    "prismarine-chunk": "^1.14.0",
+    "prismarine-provider-anvil": "^2.0.0",
+    "prismarine-provider-raw": "^1.0.1",
     "range": "0.0.3",
     "rimraf": "^3.0.2",
-    "standard": "^14.0.1",
-    "prismarine-provider-anvil": "^2.0.0",
-    "prismarine-chunk": "^1.14.0",
-    "prismarine-provider-raw": "^1.0.1"
+    "standard": "^15.0.0"
   },
   "dependencies": {
     "event-promise": "0.0.1",
