@@ -41,7 +41,7 @@
     "prismarine-provider-raw": "^1.0.1",
     "range": "0.0.3",
     "rimraf": "^3.0.2",
-    "standard": "^15.0.0"
+    "standard": "^16.0.1"
   },
   "dependencies": {
     "event-promise": "0.0.1",

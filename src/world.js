@@ -133,8 +133,8 @@ class World extends EventEmitter {
   }
 
   saveAt (pos) {
-    var chunkX = Math.floor(pos.x / 16)
-    var chunkZ = Math.floor(pos.z / 16)
+    const chunkX = Math.floor(pos.x / 16)
+    const chunkZ = Math.floor(pos.z / 16)
     if (this.storageProvider) { this.queueSaving(chunkX, chunkZ) }
   }
 
@@ -156,8 +156,8 @@ class World extends EventEmitter {
   }
 
   async getColumnAt (pos) {
-    var chunkX = Math.floor(pos.x / 16)
-    var chunkZ = Math.floor(pos.z / 16)
+    const chunkX = Math.floor(pos.x / 16)
+    const chunkZ = Math.floor(pos.z / 16)
     return this.getColumn(chunkX, chunkZ)
   }
 

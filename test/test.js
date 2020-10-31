@@ -15,10 +15,10 @@ describe('saving and loading works', function () {
   function generateRandomChunk (chunkX, chunkZ) {
     const chunk = new Chunk()
 
-    for (var x = 0; x < 16; x++) {
-      for (var z = 0; z < 16; z++) {
+    for (let x = 0; x < 16; x++) {
+      for (let z = 0; z < 16; z++) {
         chunk.setBlockType(new Vec3(x, 50, z), Math.floor(Math.random() * 50))
-        for (var y = 0; y < 256; y++) {
+        for (let y = 0; y < 256; y++) {
           chunk.setSkyLight(new Vec3(x, y, z), 15)
         }
       }
@@ -74,10 +74,10 @@ describe('Synchronous saving and loading works', function () {
   function generateRandomChunk (chunkX, chunkZ) {
     const chunk = new Chunk()
 
-    for (var x = 0; x < 16; x++) {
-      for (var z = 0; z < 16; z++) {
+    for (let x = 0; x < 16; x++) {
+      for (let z = 0; z < 16; z++) {
         chunk.setBlockType(new Vec3(x, 50, z), Math.floor(Math.random() * 50))
-        for (var y = 0; y < 256; y++) {
+        for (let y = 0; y < 256; y++) {
           chunk.setSkyLight(new Vec3(x, y, z), 15)
         }
       }
