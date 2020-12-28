@@ -1,5 +1,9 @@
 ## History
 
+### 3.2.0
+
+* add iterators
+
 ### 3.1.1
 
 * fix world.sync.getChunks()
