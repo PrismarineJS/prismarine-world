@@ -1,4 +1,4 @@
-/* global THREE XMLHttpRequest */
+/* global THREE */
 const { WorldView, Viewer } = require('prismarine-viewer/viewer')
 const { Vec3 } = require('vec3')
 global.THREE = require('three')
@@ -10,9 +10,8 @@ const viewDistance = 6
 const center = new Vec3(0, 90, 0)
 
 const World = require('prismarine-world')(version)
-const Chunk = require('prismarine-chunk')(version)
 
-const diamondSquare = require('diamond-square')({version, seed: Math.floor(Math.random() * Math.pow(2, 31))})
+const diamondSquare = require('diamond-square')({ version, seed: Math.floor(Math.random() * Math.pow(2, 31)) })
 const world = new World(diamondSquare)
 
 const worldView = new WorldView(world, viewDistance, center)
@@ -39,9 +38,9 @@ controls.update()
 
 // Browser animation loop
 const animate = () => {
-window.requestAnimationFrame(animate)
-if (controls) controls.update()
-    worldView.updatePosition(controls.target)
-    renderer.render(viewer.scene, viewer.camera)
+  window.requestAnimationFrame(animate)
+  if (controls) controls.update()
+  worldView.updatePosition(controls.target)
+  renderer.render(viewer.scene, viewer.camera)
 }
 animate()
