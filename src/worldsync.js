@@ -57,8 +57,15 @@ class WorldSync extends EventEmitter {
     return null
   }
 
+  _emitBlockUpdate (oldBlock, newBlock, position) {
+    this.emit('blockUpdate', oldBlock, newBlock)
+    if (position) this.emit(`blockUpdate:${position}`, oldBlock, newBlock)
+  }
+
   unloadColumn (chunkX, chunkZ) {
     this.async.unloadColumn(chunkX, chunkZ)
+    const columnCorner = new Vec3(chunkX * 16, 0, chunkZ * 16)
+    this.emit('chunkColumnUnload', columnCorner)
   }
 
   getColumns () {
@@ -74,7 +81,9 @@ class WorldSync extends EventEmitter {
   }
 
   setColumn (chunkX, chunkZ, chunk, save = true) {
-    return this.async.setLoadedColumn(chunkX, chunkZ, chunk, save)
+    this.async.setLoadedColumn(chunkX, chunkZ, chunk, save)
+    const columnCorner = new Vec3(chunkX * 16, 0, chunkZ * 16)
+    this.emit('chunkColumnLoad', columnCorner)
   }
 
   // Block accessors:
@@ -124,50 +133,64 @@ class WorldSync extends EventEmitter {
   setBlock (pos, block) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return
+    const oldBlock = chunk.getBlock(pos)
     chunk.setBlock(posInChunk(pos), block)
     this.async.saveAt(pos)
+    this._emitBlockUpdate(oldBlock, block)
   }
 
   setBlockStateId (pos, stateId) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return
+    const oldBlock = chunk.getBlock(pos)
     chunk.setBlockStateId(posInChunk(pos), stateId)
     this.async.saveAt(pos)
+    this._emitBlockUpdate(oldBlock, chunk.getBlock(pos), pos)
   }
 
   setBlockType (pos, blockType) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return
+    const oldBlock = chunk.getBlock(pos)
     chunk.setBlockType(posInChunk(pos), blockType)
     this.async.saveAt(pos)
+    this._emitBlockUpdate(oldBlock, chunk.getBlock(pos), pos)
   }
 
   setBlockData (pos, data) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return
+    const oldBlock = chunk.getBlock(pos)
     chunk.setBlockData(posInChunk(pos), data)
     this.async.saveAt(pos)
+    this._emitBlockUpdate(oldBlock, chunk.getBlock(pos), pos)
   }
 
   setBlockLight (pos, light) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return
+    const oldBlock = chunk.getBlock(pos)
     chunk.setBlockLight(posInChunk(pos), light)
     this.async.saveAt(pos)
+    this._emitBlockUpdate(oldBlock, chunk.getBlock(pos), pos)
   }
 
   setSkyLight (pos, light) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return
+    const oldBlock = chunk.getBlock(pos)
     chunk.setSkyLight(posInChunk(pos), light)
     this.async.saveAt(pos)
+    this._emitBlockUpdate(oldBlock, chunk.getBlock(pos), pos)
   }
 
   setBiome (pos, biome) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return
+    const oldBlock = chunk.getBlock(pos)
     chunk.setBiome(posInChunk(pos), biome)
     this.async.saveAt(pos)
+    this._emitBlockUpdate(oldBlock, chunk.getBlock(pos), pos)
   }
 }
 

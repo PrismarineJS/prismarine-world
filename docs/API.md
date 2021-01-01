@@ -26,6 +26,26 @@ Create a world instance, takes an optional `generateChunk(chunkX, chunkZ)` funct
 If provided, prismarine-world will first try to load the map from these regions, and then try to generate the world if 
 the chunk isn't saved. `savingInterval` default to 50ms.
 
+#### "blockUpdate" (oldBlock, newBlock)
+
+Fires when a block updates. Both `oldBlock` and `newBlock` provided for
+comparison.
+
+Note that `oldBlock` may be `null`.
+
+#### "blockUpdate:(x, y, z)" (oldBlock, newBlock)
+
+Fires for a specific point. Both `oldBlock` and `newBlock` provided for
+comparison.
+
+Note that `oldBlock` may be `null`.
+
+#### "chunkColumnLoad" (point)
+#### "chunkColumnUnload" (point)
+
+Fires when a chunk has updated. `point` is the coordinates to the corner
+of the chunk with the smallest x, y, and z values.
+
 ### World.initialize(iniFunc,length,width,height=256,iniPos=new Vec3(0,0,0))
 
 Initialize the world with a given blocks cube. Useful to load quickly a schematic.
@@ -127,91 +147,7 @@ Returns a promise that is resolved when all saving is done.
 
 Build a sync world, will delegate all the saving work to the async one
 
-### World.initialize(iniFunc,length,width,height=256,iniPos=new Vec3(0,0,0))
-
-Initialize the world with a given blocks cube. Useful to load quickly a schematic.
-
-* `iniFunc` is a function(x,y,z) that returns a prismarine-block
-* `length`, `width` and `height` are the size to iterate on
-* `iniPos` is the position where to start the iteration
-
-Returns an array of `{chunkX,chunkZ}`
-
-This works only on loaded columns.
-
-### World.sync.getColumns()
-
-Return all loaded columns
-
-All the following methods are sync.
-
-### World.sync.unloadColumn(chunkX,chunkZ)
-
-Unload column from memory
-
-### World.sync.setColumn(chunkX,chunkZ,chunk)
-
-Set `chunk` at `chunkX` and `chunkZ`
-
-### World.sync.getColumn(chunkX,chunkZ)
-
-Return the column at `chunkX` and `chunkZ`
-
-### World.sync.getBlock(pos)
-
-Get the [Block](https://github.com/PrismarineJS/prismarine-block) at [pos](https://github.com/andrewrk/node-vec3)
-
-### World.sync.setBlock(pos,block)
-
-Set the [Block](https://github.com/PrismarineJS/prismarine-block) at [pos](https://github.com/andrewrk/node-vec3)
-
-### World.sync.getBlockStateId(pos)
-
-Get the block state at `pos`
-
-### World.sync.getBlockType(pos)
-
-Get the block type at `pos`
-
-### World.sync.getBlockData(pos)
-
-Get the block data (metadata) at `pos`
-
-### World.sync.getBlockLight(pos)
-
-Get the block light at `pos`
-
-### World.sync.getSkyLight(pos)
-
-Get the block sky light at `pos`
-
-### World.sync.getBiome(pos)
-
-Get the block biome id at `pos`
-
-### World.sync.setBlockStateId(pos, stateId)
-
-Set the block state `stateId` at `pos`
-
-### World.sync.setBlockType(pos, id)
-
-Set the block type `id` at `pos`
-
-### World.sync.setBlockData(pos, data)
-
-Set the block `data` (metadata) at `pos`
-
-### World.sync.setBlockLight(pos, light)
-
-Set the block `light` at `pos`
-
-### World.sync.setSkyLight(pos, light)
-
-Set the block sky `light` at `pos`
-
-### World.sync.setBiome(pos, biome)
-
-Set the block `biome` id at `pos`
+It exposes the same methods as World but all methods are sync.
 
 ## Iterators
 
