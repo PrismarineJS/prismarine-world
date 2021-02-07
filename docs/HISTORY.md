@@ -1,5 +1,9 @@
 ## History
 
+### 3.3.0
+
+* Add exact raycasting
+
 ### 3.2.0
 
 * add iterators
