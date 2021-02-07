@@ -137,10 +137,10 @@ class RaycastIterator {
     let f = BlockFace.UNKNOWN
     const p = this.pos.minus(offset)
     for (const shape of shapes) {
-      let tmin = Math.abs((shape[this.stepX > 0 ? 0 : 3] - p.x) * this.tDeltaX)
-      let tmax = Math.abs((shape[this.stepX > 0 ? 3 : 0] - p.x) * this.tDeltaX)
-      const tymin = Math.abs((shape[this.stepY > 0 ? 1 : 4] - p.y) * this.tDeltaY)
-      const tymax = Math.abs((shape[this.stepY > 0 ? 4 : 1] - p.y) * this.tDeltaY)
+      let tmin = this.stepX * (shape[this.stepX > 0 ? 0 : 3] - p.x) * this.tDeltaX
+      let tmax = this.stepX * (shape[this.stepX > 0 ? 3 : 0] - p.x) * this.tDeltaX
+      const tymin = this.stepY * (shape[this.stepY > 0 ? 1 : 4] - p.y) * this.tDeltaY
+      const tymax = this.stepY * (shape[this.stepY > 0 ? 4 : 1] - p.y) * this.tDeltaY
 
       let face = this.stepX > 0 ? BlockFace.WEST : BlockFace.EAST
 
@@ -151,8 +151,8 @@ class RaycastIterator {
       }
       if (tymax < tmax) tmax = tymax
 
-      const tzmin = Math.abs((shape[this.stepZ > 0 ? 2 : 5] - p.z) * this.tDeltaZ)
-      const tzmax = Math.abs((shape[this.stepZ > 0 ? 5 : 2] - p.z) * this.tDeltaZ)
+      const tzmin = this.stepZ * (shape[this.stepZ > 0 ? 2 : 5] - p.z) * this.tDeltaZ
+      const tzmax = this.stepZ * (shape[this.stepZ > 0 ? 5 : 2] - p.z) * this.tDeltaZ
 
       if ((tmin > tzmax) || (tzmin > tmax)) continue
       if (tzmin > tmin) {
