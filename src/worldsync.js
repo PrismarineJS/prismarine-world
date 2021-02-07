@@ -48,6 +48,7 @@ class WorldSync extends EventEmitter {
         if (intersect) {
           block.position = position
           block.face = intersect.face
+          block.intersect = intersect.pos
           return block
         }
       }
