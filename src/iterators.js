@@ -111,6 +111,9 @@ class RaycastIterator {
       face: BlockFace.UNKNOWN
     }
 
+    this.pos = pos
+    this.dir = dir
+
     this.stepX = Math.sign(dir.x)
     this.stepY = Math.sign(dir.y)
     this.stepZ = Math.sign(dir.z)
@@ -124,6 +127,47 @@ class RaycastIterator {
     this.tMaxZ = (dir.z === 0) ? Number.MAX_VALUE : Math.abs((this.block.z + (dir.z > 0 ? 1 : 0) - pos.z) / dir.z)
 
     this.maxDistance = maxDistance
+  }
+
+  // Returns null if none of the shapes is intersected, otherwise returns intersect pos and face
+  // shapes are translated by offset
+  intersect (shapes, offset) {
+    // Shapes is an array of shapes, each in the form of: [x0, y0, z0, x1, y1, z1]
+    let t = Number.MAX_VALUE
+    let f = BlockFace.UNKNOWN
+    const p = this.pos.minus(offset)
+    for (const shape of shapes) {
+      let tmin = Math.abs((shape[this.stepX > 0 ? 0 : 3] - p.x) * this.tDeltaX)
+      let tmax = Math.abs((shape[this.stepX > 0 ? 3 : 0] - p.x) * this.tDeltaX)
+      const tymin = Math.abs((shape[this.stepY > 0 ? 1 : 4] - p.y) * this.tDeltaY)
+      const tymax = Math.abs((shape[this.stepY > 0 ? 4 : 1] - p.y) * this.tDeltaY)
+
+      let face = this.stepX > 0 ? BlockFace.WEST : BlockFace.EAST
+
+      if ((tmin > tymax) || (tymin > tmax)) continue
+      if (tymin > tmin) {
+        tmin = tymin
+        face = this.stepY > 0 ? BlockFace.BOTTOM : BlockFace.TOP
+      }
+      if (tymax < tmax) tmax = tymax
+
+      const tzmin = Math.abs((shape[this.stepZ > 0 ? 2 : 5] - p.z) * this.tDeltaZ)
+      const tzmax = Math.abs((shape[this.stepZ > 0 ? 5 : 2] - p.z) * this.tDeltaZ)
+
+      if ((tmin > tzmax) || (tzmin > tmax)) continue
+      if (tzmin > tmin) {
+        tmin = tzmin
+        face = this.stepZ > 0 ? BlockFace.NORTH : BlockFace.SOUTH
+      }
+      if (tzmax < tmax) tmax = tzmax
+
+      if (tmin < t) {
+        t = tmin
+        f = face
+      }
+    }
+    if (t === Number.MAX_VALUE) return null
+    return { pos: this.pos.plus(this.dir.scaled(t)), face: f }
   }
 
   next () {
