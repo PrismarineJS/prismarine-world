@@ -36,6 +36,15 @@ Initialize the world with a given blocks cube. Useful to load quickly a schemati
 
 Returns a promise containing an array of `{chunkX,chunkZ}`
 
+### World.raycast(from, direction, range, matcher = null)
+
+Raycast in the world.
+
+* `from` - Vec3, position to raycast from
+* `direction` - Vec3, direction of the ray, must be normalized
+* `range` - max distance to raycast
+* `matcher` - optional function with a block parameter, return true if the raycast should stop at this block, false otherwise
+
 ### World.getColumns()
 
 Return all loaded columns
