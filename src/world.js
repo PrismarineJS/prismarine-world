@@ -1,6 +1,7 @@
-const Vec3 = require('vec3').Vec3
-const WorldSync = require('./worldsync.js')
-const EventEmitter = require('events').EventEmitter
+const { Vec3 } = require('vec3')
+const { EventEmitter } = require('events')
+const { RaycastIterator } = require('./iterators')
+const WorldSync = require('./worldsync')
 const once = require('event-promise')
 
 function columnKeyXZ (chunkX, chunkZ) {
@@ -52,6 +53,26 @@ class World extends EventEmitter {
       }
     }
     return Promise.all(ps)
+  }
+
+  async raycast (from, direction, range, matcher = null) {
+    const iter = new RaycastIterator(from, direction, range)
+    let pos = iter.next()
+    while (pos) {
+      const position = new Vec3(pos.x, pos.y, pos.z)
+      const block = await this.getBlock(position)
+      if (block && (!matcher || matcher(block))) {
+        const intersect = iter.intersect(block.shapes, position)
+        if (intersect) {
+          block.position = position
+          block.face = intersect.face
+          block.intersect = intersect.pos
+          return block
+        }
+      }
+      pos = iter.next()
+    }
+    return null
   }
 
   getLoadedColumn (chunkX, chunkZ) {
