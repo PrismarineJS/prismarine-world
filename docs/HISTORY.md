@@ -1,5 +1,9 @@
 ## History
 
+### 3.3.1
+
+* Fix raycasting when ray is axis aligned
+
 ### 3.3.0
 
 * Add exact raycasting
