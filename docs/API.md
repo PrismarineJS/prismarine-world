@@ -217,9 +217,9 @@ Set the block `biome` id at `pos`
 
 Iterators are used to iterate over blocks. Use cases include finding specific blocks quickly and computing a ray cast.
 
-### ManathanIterator (x, y, maxDistance)
+### ManhattanIterator (x, y, maxDistance)
 
-2D spiral iterator, useful to iterate on columns that are centered on bot position
+2D rectangular spiral iterator, useful to iterate on columns that are centered on bot position
 
 #### next()
 
