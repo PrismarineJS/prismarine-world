@@ -2,7 +2,8 @@ const { Vec3 } = require('vec3')
 
 // 2D spiral iterator, useful to iterate on
 // columns that are centered on bot position
-class ManathanIterator {
+// https://en.wikipedia.org/wiki/Taxicab_geometry
+class ManhattanIterator {
   constructor (x, y, maxDistance) {
     this.maxDistance = maxDistance
     this.startx = x
@@ -204,7 +205,8 @@ class RaycastIterator {
 }
 
 module.exports = {
-  ManathanIterator,
+  ManhattanIterator,
+  ManathanIterator: ManhattanIterator, // backward compatibility
   OctahedronIterator,
   RaycastIterator,
   BlockFace
