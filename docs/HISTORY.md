@@ -1,5 +1,9 @@
 ## History
 
+### 3.4.0
+
+* add block update events
+
 ### 3.3.1
 
 * Fix raycasting when ray is axis aligned
