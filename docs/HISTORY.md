@@ -1,5 +1,9 @@
 ## History
 
+### 3.5.0
+
+* fix getBlock not setting the position of the block
+
 ### 3.4.0
 
 * add block update events
