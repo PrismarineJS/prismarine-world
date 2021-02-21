@@ -2,7 +2,7 @@ const { Vec3 } = require('vec3')
 const { EventEmitter } = require('events')
 const { RaycastIterator } = require('./iterators')
 const WorldSync = require('./worldsync')
-const once = require('event-promise')
+const { once } = require('events')
 
 function columnKeyXZ (chunkX, chunkZ) {
   return chunkX + ',' + chunkZ
