@@ -100,6 +100,8 @@ class World extends EventEmitter {
   }
 
   _emitBlockUpdate (oldBlock, newBlock, position) {
+    oldBlock.position = position.floored()
+    newBlock.position = oldBlock.position
     this.emit('blockUpdate', oldBlock, newBlock)
     this.emit(`blockUpdate:${position}`, oldBlock, newBlock)
   }

@@ -46,7 +46,6 @@ class WorldSync extends EventEmitter {
       if (block && (!matcher || matcher(block))) {
         const intersect = iter.intersect(block.shapes, position)
         if (intersect) {
-          block.position = position
           block.face = intersect.face
           block.intersect = intersect.pos
           return block
@@ -58,8 +57,10 @@ class WorldSync extends EventEmitter {
   }
 
   _emitBlockUpdate (oldBlock, newBlock, position) {
+    oldBlock.position = position.floored()
+    newBlock.position = oldBlock.position
     this.emit('blockUpdate', oldBlock, newBlock)
-    if (position) this.emit(`blockUpdate:${position}`, oldBlock, newBlock)
+    this.emit(`blockUpdate:${position}`, oldBlock, newBlock)
   }
 
   unloadColumn (chunkX, chunkZ) {
@@ -139,7 +140,7 @@ class WorldSync extends EventEmitter {
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlock(pInChunk, block)
     this.async.saveAt(pos)
-    this._emitBlockUpdate(oldBlock, block)
+    this._emitBlockUpdate(oldBlock, block, pos)
   }
 
   setBlockStateId (pos, stateId) {
