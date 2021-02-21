@@ -64,7 +64,6 @@ class World extends EventEmitter {
       if (block && (!matcher || matcher(block))) {
         const intersect = iter.intersect(block.shapes, position)
         if (intersect) {
-          block.position = position
           block.face = intersect.face
           block.intersect = intersect.pos
           return block
@@ -202,7 +201,9 @@ class World extends EventEmitter {
   }
 
   async getBlock (pos) {
-    return (await this.getColumnAt(pos)).getBlock(posInChunk(pos))
+    const block = (await this.getColumnAt(pos)).getBlock(posInChunk(pos))
+    block.position = pos.floored()
+    return block
   }
 
   async getBlockStateId (pos) {

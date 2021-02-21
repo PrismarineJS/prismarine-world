@@ -91,7 +91,9 @@ class WorldSync extends EventEmitter {
   getBlock (pos) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return null
-    return chunk.getBlock(posInChunk(pos))
+    const block = chunk.getBlock(posInChunk(pos))
+    block.position = pos.floored()
+    return block
   }
 
   getBlockStateId (pos) {
