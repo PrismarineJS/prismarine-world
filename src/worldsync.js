@@ -37,19 +37,24 @@ class WorldSync extends EventEmitter {
     }
   }
 
-  raycast (from, direction, range, matcher = null, intersectMatch = null) {
+  raycast (from, direction, range, matcher = null) {
     const iter = new RaycastIterator(from, direction, range)
     let pos = iter.next()
     while (pos) {
       const position = new Vec3(pos.x, pos.y, pos.z)
       const block = this.getBlock(position)
-      if (block && (!matcher || matcher(block))) {
-        if (intersectMatch && intersectMatch(block)) { return block }
-        const intersect = iter.intersect(block.shapes, position)
-        if (intersect) {
-          block.face = intersect.face
-          block.intersect = intersect.pos
-          return block
+      if (block) {
+        if (matcher) {
+          if (matcher(block, iter)) {
+            return block
+          }
+        } else {
+          const intersect = iter.intersect(block.shapes, position)
+          if (intersect) {
+            block.face = intersect.face
+            block.intersect = intersect.pos
+            return block
+          }
         }
       }
       pos = iter.next()
