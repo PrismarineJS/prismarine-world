@@ -106,7 +106,7 @@ class World extends EventEmitter {
     this.emit(`blockUpdate:${position}`, oldBlock, newBlock)
   }
 
-  setLoadedColumn (chunkX, chunkZ, chunk) {
+  setLoadedColumn (chunkX, chunkZ, chunk, save = true) {
     const key = columnKeyXZ(chunkX, chunkZ)
     this.columns[key] = chunk
 
@@ -121,7 +121,7 @@ class World extends EventEmitter {
     this.setLoadedColumn(chunkX, chunkZ, chunk, save)
   }
 
-  unloadColumn (chunkX, chunkZ, force = false) {
+  unloadColumn (chunkX, chunkZ) {
     const key = columnKeyXZ(chunkX, chunkZ)
     if (this.savingQueue.has(key)) {
       this.savingQueue.delete(key)
