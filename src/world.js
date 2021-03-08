@@ -106,7 +106,7 @@ class World extends EventEmitter {
     this.emit(`blockUpdate:${position}`, oldBlock, newBlock)
   }
 
-  setLoadedColumn (chunkX, chunkZ, chunk, save = true) {
+  setLoadedColumn (chunkX, chunkZ, chunk) {
     const key = columnKeyXZ(chunkX, chunkZ)
     this.columns[key] = chunk
 
