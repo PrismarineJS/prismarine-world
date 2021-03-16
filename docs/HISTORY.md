@@ -1,5 +1,9 @@
 ## History
 
+### 3.6.0
+
+* Added match while check intersect (@sefirosweb)
+
 ### 3.5.0
 
 * fix getBlock not setting the position of the block
