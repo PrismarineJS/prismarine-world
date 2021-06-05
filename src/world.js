@@ -123,6 +123,11 @@ class World extends EventEmitter {
 
   unloadColumn (chunkX, chunkZ) {
     const key = columnKeyXZ(chunkX, chunkZ)
+    if (this.savingQueue.has(key)) {
+      this.savingQueue.delete(key)
+      this.finishedSaving = Promise.all([this.finishedSaving,
+        this.storageProvider.save(chunkX, chunkZ, this.columns[key])])
+    }
     delete this.columns[key]
     const columnCorner = new Vec3(chunkX * 16, 0, chunkZ * 16)
     this.emit('chunkColumnUnload', columnCorner)
