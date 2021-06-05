@@ -5,7 +5,7 @@ const { Vec3 } = require('vec3')
 // https://en.wikipedia.org/wiki/Taxicab_geometry
 class ManhattanIterator {
   constructor (x, y, maxDistance) {
-    this.maxDistance = maxDistance
+    this.maxDistance = Math.floor(maxDistance)
     this.startx = x
     this.starty = y
     this.x = 2
