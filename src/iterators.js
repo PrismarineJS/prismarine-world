@@ -209,12 +209,12 @@ class CubeIterator2d {
    * Spiral outwards from a central position in growing squares.
    * Generates positions like this:
    * ```text
-   * 16 15 14 13 12 
-   * 17  4  3  2 11 
-   * 18  5  0  1 10 
-   * 19  6  7  8  9 
+   * 16 15 14 13 12
+   * 17  4  3  2 11
+   * 18  5  0  1 10
+   * 19  6  7  8  9
    * 20 21 22 23 24
-   * (maxDistance = 2; points returned = 25) 
+   * (maxDistance = 2; points returned = 25)
    * ```
    * Copy and past warrior source: https://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
    * @param {Vec3} pos Starting position
@@ -224,7 +224,7 @@ class CubeIterator2d {
     this.start = pos
     this.maxDistance = maxDistance
 
-    this.NUMBER_OF_POINTS = Math.floor(Math.pow((Math.floor(maxDistance) + .5) * 2, 2))
+    this.NUMBER_OF_POINTS = Math.floor(Math.pow((Math.floor(maxDistance) + 0.5) * 2, 2))
 
     // (di, dj) is a vector - direction in which we move right now
     this.di = 1
@@ -239,7 +239,7 @@ class CubeIterator2d {
     this.k = 0
   }
 
-  next() {
+  next () {
     if (this.k >= this.NUMBER_OF_POINTS) return null
     const output = this.start.offset(this.i, 0, this.j)
 
@@ -248,17 +248,17 @@ class CubeIterator2d {
     this.j += this.dj
     this.segment_passed += 1
 
-    if (this.segment_passed == this.segment_length) {
+    if (this.segment_passed === this.segment_length) {
       // done with current segment
       this.segment_passed = 0
 
       // 'rotate' directions
-      let buffer = this.di
+      const buffer = this.di
       this.di = -this.dj
       this.dj = buffer
 
       // increase segment length if necessary
-      if (this.dj == 0) {
+      if (this.dj === 0) {
         this.segment_length += 1
       }
     }
