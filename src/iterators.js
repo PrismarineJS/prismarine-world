@@ -204,9 +204,10 @@ class RaycastIterator {
   }
 }
 
-class CubeIterator2d {
+class SpiralIterator {
   /**
    * Spiral outwards from a central position in growing squares.
+   * Every point has a constant distance to its previous and following position of 1. First point returned is the starting position.
    * Generates positions like this:
    * ```text
    * 16 15 14 13 12
@@ -224,7 +225,7 @@ class CubeIterator2d {
     this.start = pos
     this.maxDistance = maxDistance
 
-    this.NUMBER_OF_POINTS = Math.floor(Math.pow((Math.floor(maxDistance) + 0.5) * 2, 2))
+    this.NUMBER_OF_POINTS = Math.floor(Math.pow((Math.floor(maxDistance) - 0.5) * 2, 2))
 
     // (di, dj) is a vector - direction in which we move right now
     this.di = 1
@@ -272,6 +273,6 @@ module.exports = {
   ManathanIterator: ManhattanIterator, // backward compatibility
   OctahedronIterator,
   RaycastIterator,
-  CubeIterator2d,
+  SpiralIterator,
   BlockFace
 }
