@@ -1,6 +1,6 @@
 {
   "name": "prismarine-world",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "The core implementation of the world for prismarine",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "game"
   ],
   "engines": {
-    "nodejs": ">=8.0.0"
+    "node": ">=8.0.0"
   },
   "enginesStrict": true,
   "author": "Will Franzen <wtfranzen@gmail.com> (http://will.xyz/)",
