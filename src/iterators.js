@@ -204,7 +204,7 @@ class RaycastIterator {
   }
 }
 
-class SpiralIterator {
+class SpiralIterator2d {
   /**
    * Spiral outwards from a central position in growing squares.
    * Every point has a constant distance to its previous and following position of 1. First point returned is the starting position.
@@ -273,6 +273,6 @@ module.exports = {
   ManathanIterator: ManhattanIterator, // backward compatibility
   OctahedronIterator,
   RaycastIterator,
-  SpiralIterator,
+  SpiralIterator2d,
   BlockFace
 }
