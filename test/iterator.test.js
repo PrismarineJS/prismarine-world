@@ -1,10 +1,11 @@
-/* eslint-env jest */
+/* eslint-env mocha */
 
 const { SpiralIterator2d } = require('../src/iterators')
 const { Vec3 } = require('vec3')
+const expect = require('expect')
 
 describe('Spiral iterator', () => {
-  test('simple function test', async () => {
+  it('simple function test', async () => {
     const startPos = new Vec3(0, 0, 0)
     const iter = new SpiralIterator2d(startPos, 2)
     const first = iter.next()
