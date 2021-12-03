@@ -194,7 +194,7 @@ class World extends EventEmitter {
   }
 
   async setBlock (pos, block) {
-    const chunk = (await this.getColumnAt(pos))
+    const chunk = await this.getColumnAt(pos)
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlock(pInChunk, block)
@@ -203,37 +203,39 @@ class World extends EventEmitter {
   }
 
   async getBlock (pos) {
-    const block = (await this.getColumnAt(pos)).getBlock(posInChunk(pos))
+    const column = await this.getColumnAt(pos)
+    if (!column) return
+    const block = column.getBlock(posInChunk(pos))
     block.position = pos.floored()
     return block
   }
 
   async getBlockStateId (pos) {
-    return (await this.getColumnAt(pos)).getBlockStateId(posInChunk(pos))
+    return (await this.getColumnAt(pos))?.getBlockStateId(posInChunk(pos))
   }
 
   async getBlockType (pos) {
-    return (await this.getColumnAt(pos)).getBlockType(posInChunk(pos))
+    return (await this.getColumnAt(pos))?.getBlockType(posInChunk(pos))
   }
 
   async getBlockData (pos) {
-    return (await this.getColumnAt(pos)).getBlockData(posInChunk(pos))
+    return (await this.getColumnAt(pos))?.getBlockData(posInChunk(pos))
   }
 
   async getBlockLight (pos) {
-    return (await this.getColumnAt(pos)).getBlockLight(posInChunk(pos))
+    return (await this.getColumnAt(pos))?.getBlockLight(posInChunk(pos))
   }
 
   async getSkyLight (pos) {
-    return (await this.getColumnAt(pos)).getSkyLight(posInChunk(pos))
+    return (await this.getColumnAt(pos))?.getSkyLight(posInChunk(pos))
   }
 
   async getBiome (pos) {
-    return (await this.getColumnAt(pos)).getBiome(posInChunk(pos))
+    return (await this.getColumnAt(pos))?.getBiome(posInChunk(pos))
   }
 
   async setBlockStateId (pos, stateId) {
-    const chunk = (await this.getColumnAt(pos))
+    const chunk = await this.getColumnAt(pos)
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockStateId(pInChunk, stateId)
