@@ -2,7 +2,7 @@ import type { EventEmitter } from "events";
 import type { Vec3 } from "vec3";
 import type {Block} from "prismarine-block"
 import {Chunk} from "../../prismarine-chunk"
-import {RaycastBlock, RaycastMatcher } from "./raycast";
+import {RaycastBlock, RaycastMatcher} from "./raycast";
 
 
 type ChunkGenerator = (chunkX: number, chunkZ: number) => Chunk;
