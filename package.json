@@ -33,7 +33,7 @@
   "devDependencies": {
     "buffer-equal": "^1.0.0",
     "flatmap": "0.0.3",
-    "minecraft-data": "^2.47.0",
+    "minecraft-data": "^3.0.0",
     "mkdirp": "^0.5.1",
     "prismarine-chunk": "^1.14.0",
     "prismarine-world": "file:.",
