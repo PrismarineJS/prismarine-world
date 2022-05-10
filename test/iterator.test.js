@@ -2,7 +2,7 @@
 
 const { SpiralIterator2d } = require('../src/iterators')
 const { Vec3 } = require('vec3')
-const expect = require('expect')
+const expect = require('expect').default
 
 describe('Spiral iterator', () => {
   it('simple function test', async () => {
