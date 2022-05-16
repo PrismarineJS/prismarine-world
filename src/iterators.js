@@ -217,7 +217,7 @@ class SpiralIterator2d {
    * 20 21 22 23 24
    * (maxDistance = 2; points returned = 25)
    * ```
-   * Copy and past warrior source: https://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
+   * Copy and paste warrior source: https://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
    * @param {Vec3} pos Starting position
    * @param {number} maxDistance Max distance from starting position
    */
