@@ -1,4 +1,5 @@
 import {World} from "./world"
 
-export {iterators} from "./raycast"
+export * as iterators from "./iterators";
+
 export default function loader(mcVersion: string): typeof World;
