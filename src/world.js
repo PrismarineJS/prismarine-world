@@ -125,7 +125,7 @@ class World extends EventEmitter {
   unloadColumn (chunkX, chunkZ) {
     const key = columnKeyXZ(chunkX, chunkZ)
     if (this.savingQueue.has(key)) {
-      this.unloadQueue.set(key, { chunkX, chunkZ })      
+      this.unloadQueue.set(key, { chunkX, chunkZ })
     } else {
       delete this.columns[key]
       const columnCorner = new Vec3(chunkX * 16, 0, chunkZ * 16)
@@ -142,12 +142,12 @@ class World extends EventEmitter {
     for (const [key, { chunkX, chunkZ }] of this.savingQueue.entries()) {
       this.finishedSaving = Promise.all([this.finishedSaving,
         this.storageProvider.save(chunkX, chunkZ, this.columns[key])
-         .then(() => {
+          .then(() => {
             if (this.unloadQueue.has(key)) {
               this.unloadQueue.delete(key)
               this.unloadColumn(chunkX, chunkZ)
-          }
-        })
+            }
+          })
       ])
     }
     this.savingQueue.clear()
