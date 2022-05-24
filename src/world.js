@@ -124,7 +124,7 @@ class World extends EventEmitter {
 
   unloadColumn (chunkX, chunkZ) {
     const key = columnKeyXZ(chunkX, chunkZ)
-    if (this.savingQueue.has(key)) {
+    if (this.storageProvider && this.savingQueue.has(key)) {
       this.unloadQueue.set(key, { chunkX, chunkZ })
     } else {
       delete this.columns[key]
