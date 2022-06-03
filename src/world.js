@@ -128,10 +128,17 @@ class World extends EventEmitter {
     if (this.storageProvider && this.savingQueue.has(key)) {
       this.unloadQueue.set(key, { chunkX, chunkZ })
     } else {
-      delete this.columns[key]
-      const columnCorner = new Vec3(chunkX * 16, 0, chunkZ * 16)
-      this.emit('chunkColumnUnload', columnCorner)
+      this.forceUnloadColumn(key, chunkX, chunkZ)
     }
+  }
+
+  forceUnloadColumn (key, chunkX, chunkZ) {
+    if (this.unloadQueue.has(key)) {
+      this.unloadQueue.delete(key)
+    }
+    delete this.columns[key]
+    const columnCorner = new Vec3(chunkX * 16, 0, chunkZ * 16)
+    this.emit('chunkColumnUnload', columnCorner)
   }
 
   async saveNow () {
@@ -143,15 +150,13 @@ class World extends EventEmitter {
     for (const [key, { chunkX, chunkZ }] of this.savingQueue.entries()) {
       this.finishedSaving = Promise.all([this.finishedSaving,
         this.storageProvider.save(chunkX, chunkZ, this.columns[key])
-          .then(() => {
-            if (this.unloadQueue.has(key)) {
-              this.unloadQueue.delete(key)
-              this.unloadColumn(chunkX, chunkZ)
-            }
-          })
       ])
     }
+    await this.finishedSaving
     this.savingQueue.clear()
+    for (const [key, { chunkX, chunkZ }] of this.unloadQueue.entries()) {
+      this.forceUnloadColumn(key, chunkX, chunkZ)
+    }
     this.emit('doneSaving')
   }
 
