@@ -158,10 +158,9 @@ class World extends EventEmitter {
     if (this.savingInterval !== 0) {
       this.savingInt = setTimeout(async () => {
         this.saveNow()
-          .then( () => {
+          .then(() => {
             this.startSaving()
-          }
-        )
+          })
       }, this.savingInterval)
     }
   }
