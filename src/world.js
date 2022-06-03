@@ -18,6 +18,7 @@ class World extends EventEmitter {
     this.savingQueue = new Map()
     this.unloadQueue = new Map()
     this.finishedSaving = Promise.resolve()
+    this.currentlySaving = false // semaphore for saving
     this.columns = {}
     this.chunkGenerator = chunkGenerator
     this.storageProvider = storageProvider
@@ -143,7 +144,6 @@ class World extends EventEmitter {
       this.finishedSaving = Promise.all([this.finishedSaving,
         this.storageProvider.save(chunkX, chunkZ, this.columns[key])
           .then(() => {
-            this.savingQueue.delete(key)
             if (this.unloadQueue.has(key)) {
               this.unloadQueue.delete(key)
               this.unloadColumn(chunkX, chunkZ)
@@ -151,18 +151,18 @@ class World extends EventEmitter {
           })
       ])
     }
+    this.savingQueue.clear()
     this.emit('doneSaving')
   }
 
   startSaving () {
-    if (this.savingInterval !== 0) {
-      this.savingInt = setTimeout(async () => {
-        this.saveNow()
-          .then(() => {
-            this.startSaving()
-          })
-      }, this.savingInterval)
-    }
+    this.savingInt = setInterval(async () => {
+      if (this.currentlySaving === false) {
+        this.currentlySaving = true
+        await this.saveNow()
+        this.currentlySaving = false
+      }
+    }, this.savingInterval)
   }
 
   async waitSaving () {
@@ -174,7 +174,7 @@ class World extends EventEmitter {
   }
 
   stopSaving () {
-    this.savingInterval = 0
+    clearInterval(this.savingInt)
   }
 
   queueSaving (chunkX, chunkZ) {
