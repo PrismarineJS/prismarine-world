@@ -24,11 +24,15 @@ class ManhattanIterator {
     this.leg = -1
   }
 
+  /**
+   * Returns the next position. If the iterator is at the end, returns null. Position will be 2d along the x z plane and y always being 0.
+   * @returns {Vec3 | null} 
+   */
   next () {
     if (this.leg === -1) {
       // use -1 as the center
       this.leg = 0
-      return { x: this.startx, y: this.starty }
+      return new Vec3(this.startx, 0, this.starty)
     } else if (this.leg === 0) {
       if (this.maxDistance === 1) return null
       this.x--
