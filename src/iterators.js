@@ -26,7 +26,7 @@ class ManhattanIterator {
 
   /**
    * Returns the next position. If the iterator is at the end, returns null. Position will be 2d along the x z plane and y always being 0.
-   * @returns {Vec3 | null} 
+   * @returns {Vec3 | null}
    */
   next () {
     if (this.leg === -1) {
