@@ -24,11 +24,15 @@ class ManhattanIterator {
     this.leg = -1
   }
 
+  /**
+   * Returns the next position. If the iterator is at the end, returns null. Position will be 2d along the x z plane and y always being 0.
+   * @returns {Vec3 | null}
+   */
   next () {
     if (this.leg === -1) {
       // use -1 as the center
       this.leg = 0
-      return { x: this.startx, y: this.starty }
+      return new Vec3(this.startx, 0, this.starty)
     } else if (this.leg === 0) {
       if (this.maxDistance === 1) return null
       this.x--
@@ -217,7 +221,7 @@ class SpiralIterator2d {
    * 20 21 22 23 24
    * (maxDistance = 2; points returned = 25)
    * ```
-   * Copy and past warrior source: https://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
+   * Copy and paste warrior source: https://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
    * @param {Vec3} pos Starting position
    * @param {number} maxDistance Max distance from starting position
    */
