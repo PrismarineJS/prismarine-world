@@ -134,9 +134,10 @@ class World extends EventEmitter {
     }
     // We could set a limit on the number of chunks to save at each
     // interval. The set structure is maintaining the order of insertion
-    for (const [key, { chunkX, chunkZ }] of this.savingQueue.entries()) {
+    for (const { chunkX, chunkZ, chunk } of this.savingQueue.values()) {
+      if (!chunk) continue // The chunk reference is added when a new chunk is added to the savings queue. This prevents the storage building trying to save unloaded chunks.
       this.finishedSaving = Promise.all([this.finishedSaving,
-        this.storageProvider.save(chunkX, chunkZ, this.columns[key])])
+        this.storageProvider.save(chunkX, chunkZ, chunk)])
     }
     this.savingQueue.clear()
     this.emit('doneSaving')
@@ -161,7 +162,8 @@ class World extends EventEmitter {
   }
 
   queueSaving (chunkX, chunkZ) {
-    this.savingQueue.set(columnKeyXZ(chunkX, chunkZ), { chunkX, chunkZ })
+    const key = columnKeyXZ(chunkX, chunkZ)
+    this.savingQueue.set(key, { chunkX, chunkZ, chunk: this.columns[key] })
   }
 
   saveAt (pos) {
