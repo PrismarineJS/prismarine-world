@@ -8,7 +8,7 @@
 
 [![Try it on gitpod](https://img.shields.io/badge/try-on%20gitpod-brightgreen.svg)](https://gitpod.io/#https://github.com/PrismarineJS/prismarine-world)
 
-Provides a minecraft world: an infinite collection of 16x256x26 chunks.
+Provides a minecraft world: an infinite collection of 16x256x16 chunks.
 
 ## Usage
 
