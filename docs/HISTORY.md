@@ -1,5 +1,12 @@
 ## History
 
+### 3.6.2
+
+* Fix chunk saving reference errors (@kf106 & @moonborrow) [#100](https://github.com/PrismarineJS/prismarine-world/pull/100)
+* Fix typo in README.md (@takeru) [#108](https://github.com/PrismarineJS/prismarine-world/pull/108)
+* Improved types (@TRCYX) [#99](https://github.com/PrismarineJS/prismarine-world/pull/99)
+* Fix ManhattanIterator [#101](https://github.com/PrismarineJS/prismarine-world/pull/101) (@IceTank)
+
 ### 3.6.1
 
 * Update mcdata
