@@ -16,7 +16,9 @@ class World extends EventEmitter {
   constructor (chunkGenerator, storageProvider = null, savingInterval = 1000) {
     super()
     this.savingQueue = new Map()
+    this.unloadQueue = new Map()
     this.finishedSaving = Promise.resolve()
+    this.currentlySaving = false // semaphore for saving
     this.columns = {}
     this.chunkGenerator = chunkGenerator
     this.storageProvider = storageProvider
@@ -123,6 +125,17 @@ class World extends EventEmitter {
 
   unloadColumn (chunkX, chunkZ) {
     const key = columnKeyXZ(chunkX, chunkZ)
+    if (this.storageProvider && this.savingQueue.has(key)) {
+      this.unloadQueue.set(key, { chunkX, chunkZ })
+    } else {
+      this.forceUnloadColumn(key, chunkX, chunkZ)
+    }
+  }
+
+  forceUnloadColumn (key, chunkX, chunkZ) {
+    if (this.unloadQueue.has(key)) {
+      this.unloadQueue.delete(key)
+    }
     delete this.columns[key]
     const columnCorner = new Vec3(chunkX * 16, 0, chunkZ * 16)
     this.emit('chunkColumnUnload', columnCorner)
@@ -136,15 +149,24 @@ class World extends EventEmitter {
     // interval. The set structure is maintaining the order of insertion
     for (const [key, { chunkX, chunkZ }] of this.savingQueue.entries()) {
       this.finishedSaving = Promise.all([this.finishedSaving,
-        this.storageProvider.save(chunkX, chunkZ, this.columns[key])])
+        this.storageProvider.save(chunkX, chunkZ, this.columns[key])
+      ])
     }
+    await this.finishedSaving
     this.savingQueue.clear()
+    for (const [key, { chunkX, chunkZ }] of this.unloadQueue.entries()) {
+      this.forceUnloadColumn(key, chunkX, chunkZ)
+    }
     this.emit('doneSaving')
   }
 
   startSaving () {
     this.savingInt = setInterval(async () => {
-      await this.saveNow()
+      if (this.currentlySaving === false) {
+        this.currentlySaving = true
+        await this.saveNow()
+        this.currentlySaving = false
+      }
     }, this.savingInterval)
   }
 
