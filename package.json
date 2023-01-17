@@ -44,7 +44,7 @@
     "prismarine-world": "file:.",
     "process": "^0.11.0",
     "range": "0.0.3",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.1.0",
     "standard": "^17.0.0"
   },
   "dependencies": {
