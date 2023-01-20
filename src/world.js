@@ -12,7 +12,7 @@ function posInChunk (pos) {
   return new Vec3(Math.floor(pos.x) & 15, Math.floor(pos.y), Math.floor(pos.z) & 15)
 }
 
-export class World extends EventEmitter {
+class World extends EventEmitter {
   constructor (chunkGenerator, storageProvider = null, savingInterval = 1000) {
     super()
     this.savingQueue = new Map()
@@ -313,4 +313,7 @@ function loader (mcVersion) {
   return World
 }
 
-module.exports = loader
+module.exports = {
+  loader,
+  World
+}
