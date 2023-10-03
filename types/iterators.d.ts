@@ -17,6 +17,10 @@ export type RaycastBlock = {
     face: BlockFace;
 };
 
+export type RaycastResult = RaycastBlock & {
+    intersect: Vec3;
+}
+
 export type RaycastIntersection = {
     pos: Vec3;
     face: BlockFace;

@@ -162,7 +162,7 @@ export declare class WorldSync extends EventEmitter {
         direction: Vec3,
         range: number,
         matcher?: (block: Block) => boolean,
-    ): RaycastBlock | null;
+    ): RaycastResult | null;
 
     private _emitBlockUpdate(
         oldBlock: Block,
