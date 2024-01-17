@@ -32,19 +32,17 @@
   },
   "homepage": "https://github.com/PrismarineJS/prismarine-world",
   "devDependencies": {
-    "buffer-equal": "^1.0.0",
     "expect": "^29.1.0",
     "flatmap": "0.0.3",
-    "minecraft-data": "^3.0.0",
+    "minecraft-data": "^3.59.3",
     "mkdirp": "^0.5.1",
     "mocha": "^10.0.0",
     "prismarine-chunk": "^1.31.0",
     "prismarine-provider-anvil": "^2.0.0",
     "prismarine-provider-raw": "^1.0.1",
+    "prismarine-registry": "^1.7.0",
     "prismarine-world": "file:.",
-    "process": "^0.11.0",
     "range": "0.0.3",
-    "rimraf": "^3.0.2",
     "standard": "^17.0.0"
   },
   "dependencies": {
