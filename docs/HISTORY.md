@@ -1,5 +1,11 @@
 ## History
 
+### 3.6.3
+
+* Add intersect property to raycast result type [#137](https://github.com/PrismarineJS/prismarine-world/pull/137)
+* Update workflow templates
+* Update to Node 18
+
 ### 3.6.2
 
 * Fix chunk saving reference errors (@kf106 & @moonborrow) [#100](https://github.com/PrismarineJS/prismarine-world/pull/100)
