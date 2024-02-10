@@ -44,6 +44,8 @@ export declare class World extends EventEmitter {
         iniPos?: Vec3,
     ): Promise<ChunkCoordinates[]>;
 
+    setRegistry (registry): void;
+
     /**
      * 
      * @param {Vec3} from Position to start raycasting from.
@@ -91,6 +93,8 @@ export declare class World extends EventEmitter {
     public waitSaving(): Promise<void>;
 
     public stopSaving(): void;
+
+    public saveAndQuit(timeout?): Promise<void>;
 
     public queueSaving(chunkX: number, chunkZ: number): void;
 
@@ -184,6 +188,9 @@ export declare class WorldSync extends EventEmitter {
     ): void;
 
     public unloadColumn(chunkX: number, chunkZ: number): void;
+
+    public buildBlockCache(): void;
+    public getCachedBlock(pos: Vec3): Block;
 
     public getBlock(pos: Vec3): Block;
 
