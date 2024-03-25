@@ -6,7 +6,7 @@ import type { RaycastBlock } from "./iterators";
 
 export type Chunk = InstanceType<ReturnType<typeof loaderOfChunk>>;
 
-type MaybePromise = Promise<void> | void;
+type MaybePromise<T> = Promise<T> | T;
 
 export type ChunkGenerator = (chunkX: number, chunkZ: number) => MaybePromise<Chunk | undefined>;
 export type ChunkCoordinates = { chunkX: number, chunkZ: number };
