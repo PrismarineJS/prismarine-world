@@ -8,7 +8,7 @@ export type Chunk = InstanceType<ReturnType<typeof loaderOfChunk>>;
 
 type MaybePromise<T> = Promise<T> | T;
 
-export type ChunkGenerator = (chunkX: number, chunkZ: number) => MaybePromise<Chunk | undefined>;
+export type ChunkGenerator = (chunkX: number, chunkZ: number) => MaybePromise<Chunk>;
 export type ChunkCoordinates = { chunkX: number, chunkZ: number };
 export type ChunkCoordsAndColumn = { chunkX: number, chunkZ: number, column: Chunk };
 

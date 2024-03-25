@@ -3,6 +3,7 @@
 ## World
 
 The API is split in 2 :
+
 * the World which is async
 * the World.sync which is sync
 
@@ -22,7 +23,7 @@ multi player clients)
 ### World([generateChunk,[storageProvider]],[savingInterval])
 
 Create a world instance, takes an optional `generateChunk(chunkX, chunkZ)` function that will get called when a chunk at
-`chunkX` and `chunkZ` need to be generated. The function can be either sync or async and should return new chunk. Takes a second optional arguments : `storageProvider` containing the regions.
+`chunkX` and `chunkZ` need to be generated. The function can be either sync or async and must return new chunk. Takes a second optional arguments : `storageProvider` containing the regions.
 If provided, prismarine-world will first try to load the map from these regions, and then try to generate the world if
 the chunk isn't saved. `savingInterval` default to 50ms.
 
@@ -41,6 +42,7 @@ comparison.
 Note that `oldBlock` may be `null`.
 
 #### "chunkColumnLoad" (point)
+
 #### "chunkColumnUnload" (point)
 
 Fires when a chunk has updated. `point` is the coordinates to the corner
