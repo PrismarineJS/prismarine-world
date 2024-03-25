@@ -6,7 +6,9 @@ import type { RaycastBlock } from "./iterators";
 
 export type Chunk = InstanceType<ReturnType<typeof loaderOfChunk>>;
 
-export type ChunkGenerator = (chunkX: number, chunkZ: number) => Chunk;
+type MaybePromise = Promise<void> | void;
+
+export type ChunkGenerator = (chunkX: number, chunkZ: number) => MaybePromise<Chunk | undefined>;
 export type ChunkCoordinates = { chunkX: number, chunkZ: number };
 export type ChunkCoordsAndColumn = { chunkX: number, chunkZ: number, column: Chunk };
 
@@ -45,7 +47,7 @@ export declare class World extends EventEmitter {
     ): Promise<ChunkCoordinates[]>;
 
     /**
-     * 
+     *
      * @param {Vec3} from Position to start raycasting from.
      * @param {Vec3} direction Normalized vector, direction of raycast.
      * @param {number} range Maximum range to raycast.
@@ -151,7 +153,7 @@ export declare class WorldSync extends EventEmitter {
     ): void;
 
     /**
-     * 
+     *
      * @param {Vec3} from Position to start raycasting from.
      * @param {Vec3} direction Normalized vector, direction of raycast.
      * @param {number} range Maximum range to raycast.

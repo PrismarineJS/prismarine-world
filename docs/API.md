@@ -3,27 +3,27 @@
 ## World
 
 The API is split in 2 :
-* the World which is async 
+* the World which is async
 * the World.sync which is sync
 
-The characteristics of the async world is that it will always return something when getting a block, but as a promise. To achieve this it 
-may load columns from anvil files or other storage. On the other hand the sync world will not always return blocks and may return null, 
+The characteristics of the async world is that it will always return something when getting a block, but as a promise. To achieve this it
+may load columns from anvil files or other storage. On the other hand the sync world will not always return blocks and may return null,
 but it will return the block directly with no promise.
 
-The set operations have similar characteristics : the async world will always set the blocks and return a promise, whereas the sync world will 
+The set operations have similar characteristics : the async world will always set the blocks and return a promise, whereas the sync world will
 not always set the blocks, but do the action now and not return a promise.
 
 The 2 world are linked and stay in sync together.
 
 The async world may be more natural for servers (although the sync world can also be used there)
-The sync world makes more sense for clients as there is not necessarily somewhere to load more data from (but in some cases this may be incorrect too, think 
+The sync world makes more sense for clients as there is not necessarily somewhere to load more data from (but in some cases this may be incorrect too, think
 multi player clients)
 
 ### World([generateChunk,[storageProvider]],[savingInterval])
 
-Create a world instance, takes an optional `generateChunk(chunkX, chunkZ)` function that will get called when a chunk at 
-`chunkX` and `chunkZ` need to be generated. Takes a second optional arguments : `storageProvider` containing the regions.
-If provided, prismarine-world will first try to load the map from these regions, and then try to generate the world if 
+Create a world instance, takes an optional `generateChunk(chunkX, chunkZ)` function that will get called when a chunk at
+`chunkX` and `chunkZ` need to be generated. The function can be either sync or async and should return new chunk. Takes a second optional arguments : `storageProvider` containing the regions.
+If provided, prismarine-world will first try to load the map from these regions, and then try to generate the world if
 the chunk isn't saved. `savingInterval` default to 50ms.
 
 #### "blockUpdate" (oldBlock, newBlock)
@@ -161,7 +161,7 @@ Iterators are used to iterate over blocks. Use cases include finding specific bl
 
 return null or the next position (Vec3)
 
-### OctahedronIterator (start, maxDistance) 
+### OctahedronIterator (start, maxDistance)
 
 start is a Vec3
 
@@ -169,11 +169,11 @@ start is a Vec3
 
 return null or the next position (Vec3)
 
-### RaycastIterator (pos, dir, maxDistance) 
+### RaycastIterator (pos, dir, maxDistance)
 
 pos and dir are Vec3
 
-RaycastIterator iterates along a ray starting at `pos` in `dir` direction. 
+RaycastIterator iterates along a ray starting at `pos` in `dir` direction.
 It steps exactly 1 block at a time, returning the block coordinates and the face by which the ray entered the block.
 
 #### next()
@@ -186,7 +186,7 @@ return null or the next position (Vec3)
 
 `maxDistance` is number
 
-Iterates outwards along x and z axis in a cubic spiral. First position returned is the starting position. Every step is 1 step away form the previous and next point. 
+Iterates outwards along x and z axis in a cubic spiral. First position returned is the starting position. Every step is 1 step away form the previous and next point.
 
 #### next()
 
@@ -195,4 +195,3 @@ return null or the next position (Vec3)
 #### NUMBER_OF_POINTS
 
 Number of points the iterator will return.
-

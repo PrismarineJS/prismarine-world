@@ -93,7 +93,7 @@ class World extends EventEmitter {
       }
       const loaded = chunk != null
       if (!loaded && this.chunkGenerator) {
-        chunk = this.chunkGenerator(chunkX, chunkZ)
+        chunk = await this.chunkGenerator(chunkX, chunkZ)
       }
       if (chunk != null) { await this.setColumn(chunkX, chunkZ, chunk, !loaded) }
     }

@@ -7,4 +7,4 @@ export * as iterators from "./iterators";
 import type * as world from "./world";
 export { world };
 
-export default function loader(mcVersion: string): typeof World;
+export = (mcVersion: string) => typeof World;
