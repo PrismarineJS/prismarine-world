@@ -2,7 +2,7 @@ import type { EventEmitter } from "events";
 import type { Vec3 } from "vec3";
 import type { Block } from "prismarine-block";
 import loaderOfChunk from "prismarine-chunk";
-import type { RaycastBlock } from "./iterators";
+import type { RaycastBlock, RaycastResult } from "./iterators";
 
 export type Chunk = InstanceType<ReturnType<typeof loaderOfChunk>>;
 
