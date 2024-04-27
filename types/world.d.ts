@@ -56,7 +56,7 @@ export declare class World extends EventEmitter {
         direction: Vec3,
         range: number,
         matcher?: (block: Block) => boolean,
-    ): Promise<RaycastBlock | null>;
+    ): Promise<RaycastResult | null>;
 
     public getLoadedColumn(chunkX: number, chunkZ: number): Chunk;
 
