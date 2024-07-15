@@ -38,7 +38,7 @@
     "minecraft-data": "^3.0.0",
     "mkdirp": "^0.5.1",
     "mocha": "^10.0.0",
-    "prismarine-chunk": "^1.31.0",
+    "prismarine-chunk": "github:qwqtoday/prismarine-chunk",
     "prismarine-provider-anvil": "^2.0.0",
     "prismarine-provider-raw": "^1.0.1",
     "prismarine-world": "file:.",
