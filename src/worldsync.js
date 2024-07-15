@@ -139,6 +139,14 @@ class WorldSync extends EventEmitter {
     return chunk.getBiome(posInChunk(pos))
   }
 
+  getEntities () {
+    return this.async.getEntities()
+  }
+
+  getEntity (id) {
+    return this.async.getEntity(id)
+  }
+
   setBlock (pos, block) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return
@@ -207,6 +215,10 @@ class WorldSync extends EventEmitter {
     chunk.setBiome(pInChunk, biome)
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
+  }
+
+  removeEntity (id) {
+    this.async.removeEntity(id)
   }
 }
 

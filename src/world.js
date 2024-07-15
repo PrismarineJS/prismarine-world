@@ -209,6 +209,18 @@ class World extends EventEmitter {
     return this.getLoadedColumn(chunkX, chunkZ)
   }
 
+  getEntities () {
+    const entities = {}
+    const chunkColumns = this.getColumns().map(({ chunkX, chunkZ, column }) => column.entities)
+    Object.assign(entities, ...chunkColumns)
+
+    return entities
+  }
+
+  getEntity (id) {
+    return this.getEntities()[id] ?? null
+  }
+
   async getColumnAt (pos) {
     const chunkX = Math.floor(pos.x / 16)
     const chunkZ = Math.floor(pos.z / 16)
@@ -306,6 +318,21 @@ class World extends EventEmitter {
     chunk.setBiome(pInChunk, biome)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
+  }
+
+  async setEntity (id, entity) {
+    const pos = entity.pos
+    const chunk = (await this.getColumnAt(pos))
+
+    chunk.setEntity(id, entity)
+  }
+
+  async removeEntity (id) {
+    const entity = await this.getEntity(id)
+    const pos = entity.pos
+    const chunk = (await this.getColumnAt(pos))
+
+    chunk.removeEntity(id)
   }
 }
 
