@@ -39,7 +39,7 @@ class WorldSync extends EventEmitter {
 
   raycast (from, direction, range, matcher = null) {
     const iter = new RaycastIterator(from, direction, range)
-    let pos = iter.next()
+    let pos = from
     while (pos) {
       const position = new Vec3(pos.x, pos.y, pos.z)
       const block = this.getBlock(position)
