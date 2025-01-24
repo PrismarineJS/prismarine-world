@@ -46,6 +46,9 @@ Note that `oldBlock` may be `null`.
 Fires when a chunk has updated. `point` is the coordinates to the corner
 of the chunk with the smallest x, y, and z values.
 
+### World.setRegistry (registry)
+Sets the prismarine-registry instance to use for block data
+
 ### World.initialize(iniFunc,length,width,height=256,iniPos=new Vec3(0,0,0))
 
 Initialize the world with a given blocks cube. Useful to load quickly a schematic.
@@ -143,11 +146,25 @@ Set the block `biome` id at `pos`
 
 Returns a promise that is resolved when all saving is done.
 
+### World.saveAndQuit([timeout])
+
+Save all chunks and stop all timers. Returns a promise that is resolved when all saving is done.
+
 ### World.sync(asyncWorld)
 
 Build a sync world, will delegate all the saving work to the async one
 
-It exposes the same methods as World but all methods are sync.
+It exposes the same methods as World except `getCachedBlock()` but all methods are sync.
+
+### .buildBlockCache()
+
+Builds block cache that enables usage of the getCachedBlock() method. Requires that .setRegistry() has been called with a prismarine-registry instance.
+
+### .getCachedBlock(pos)
+
+Returns a prismarine-block instance of the block at the given position. If the block is not in the cache, it will be loaded from the world.
+The purpose of this function is to prevent the construction of a new prismarine-block instance, which can be helpful in hot code to lessen
+the creation of temporary object garbage.
 
 ## Iterators
 
