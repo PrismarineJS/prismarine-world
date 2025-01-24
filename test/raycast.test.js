@@ -46,4 +46,12 @@ describe('raycasting', function () {
     const down = await world.raycast(head, new Vec3(0, -1, 0), 10)
     assert.notStrictEqual(down, null)
   })
+
+  it('raycast inside a block', async () => {
+    const head = new Vec3(0, 3.6, 0)
+    const inside = await world.raycast(head, new Vec3(0, 0, 1), 10)
+    assert.strictEqual(inside.position.x, 0)
+    assert.strictEqual(inside.position.y, 3)
+    assert.strictEqual(inside.position.z, 0)
+  })
 })
