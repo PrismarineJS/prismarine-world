@@ -3,6 +3,7 @@ const { EventEmitter } = require('events')
 const { RaycastIterator } = require('./iterators')
 const WorldSync = require('./worldsync')
 const { once } = require('events')
+const blockLoader = require('prismarine-block')
 
 function columnKeyXZ (chunkX, chunkZ) {
   return chunkX + ',' + chunkZ
@@ -25,6 +26,11 @@ class World extends EventEmitter {
     this.savingInterval = savingInterval
     this.sync = new WorldSync(this)
     if (storageProvider && savingInterval !== 0) this.startSaving()
+  }
+
+  setRegistry (registry) {
+    this.registry = registry
+    this.Block = blockLoader(this.registry)
   }
 
   initialize (iniFunc, length, width, height = 256, iniPos = new Vec3(0, 0, 0)) {
@@ -180,6 +186,20 @@ class World extends EventEmitter {
 
   stopSaving () {
     clearInterval(this.savingInt)
+  }
+
+  async saveAndQuit (timeout = 10000) {
+    this.stopSaving()
+    let timer
+    await new Promise((resolve, reject) => {
+      Promise.race([
+        this.waitSaving(),
+        new Promise((resolve, reject) => {
+          timer = setTimeout(reject, timeout)
+        })
+      ]).then(resolve).catch(reject)
+    })
+    clearTimeout(timer)
   }
 
   queueSaving (chunkX, chunkZ) {

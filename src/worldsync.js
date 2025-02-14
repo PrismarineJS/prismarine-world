@@ -94,6 +94,21 @@ class WorldSync extends EventEmitter {
   }
 
   // Block accessors:
+  buildBlockCache () {
+    if (!this.async.Block) throw new Error('Registry not set')
+    const blockStates = this.async.registry.blocksByStateId
+    this.blockCache = {}
+    for (const stateId in blockStates) {
+      this.blockCache[stateId] = this.async.Block.fromStateId(stateId)
+    }
+  }
+
+  getCachedBlock (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return null
+    const block = this.blockCache[chunk.getBlockStateId(posInChunk(pos))]
+    return block
+  }
 
   getBlock (pos) {
     const chunk = this.getColumnAt(pos)
