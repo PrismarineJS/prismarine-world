@@ -37,7 +37,7 @@ class WorldSync extends EventEmitter {
     }
   }
 
-raycast (from, direction, range, matcher = null) {
+  raycast (from, direction, range, matcher = null) {
     const iter = new RaycastIterator(from, direction, range)
     let pos = from
     while (pos) {
@@ -55,7 +55,7 @@ raycast (from, direction, range, matcher = null) {
     }
     return null
   }
-  
+
   _emitBlockUpdate (oldBlock, newBlock, position) {
     oldBlock.position = position.floored()
     newBlock.position = oldBlock.position
