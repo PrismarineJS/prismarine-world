@@ -20,6 +20,7 @@ class World extends EventEmitter {
     this.finishedSaving = Promise.resolve()
     this.currentlySaving = false // semaphore for saving
     this.columns = {}
+    this.entities = new Map() // Entity storage by UUID
     this.chunkGenerator = chunkGenerator
     this.storageProvider = storageProvider
     this.savingInterval = savingInterval
@@ -306,6 +307,23 @@ class World extends EventEmitter {
     chunk.setBiome(pInChunk, biome)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
+  }
+
+  // Basic entity storage methods
+  setEntity (uuid, entityData) {
+    this.entities.set(uuid, entityData)
+  }
+
+  getEntity (uuid) {
+    return this.entities.get(uuid)
+  }
+
+  removeEntity (uuid) {
+    return this.entities.delete(uuid)
+  }
+
+  getAllEntities () {
+    return Array.from(this.entities.values())
   }
 }
 
