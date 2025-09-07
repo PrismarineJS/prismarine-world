@@ -139,6 +139,22 @@ Set the block sky `light` at `pos`
 
 Set the block `biome` id at `pos`
 
+### World.setEntity(uuid, entityData)
+
+Store an entity with the given `uuid` and `entityData` in the world
+
+### World.getEntity(uuid)
+
+Get the entity with the given `uuid` from the world, returns `undefined` if not found
+
+### World.removeEntity(uuid)
+
+Remove the entity with the given `uuid` from the world, returns `true` if removed, `false` if not found
+
+### World.getAllEntities()
+
+Get an array of all entities stored in the world
+
 ### World.waitSaving()
 
 Returns a promise that is resolved when all saving is done.
