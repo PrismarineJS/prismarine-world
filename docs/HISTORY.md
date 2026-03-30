@@ -1,5 +1,15 @@
 ## History
 
+### 3.7.0
+* [Update CI to Node 24 (#160)](https://github.com/PrismarineJS/prismarine-world/commit/3dea527a5ce2c37f771496470172ce3f64587418) (thanks @rom1504)
+* [Fix publish condition for npm-publish v4 (#159)](https://github.com/PrismarineJS/prismarine-world/commit/b0c44b621d3318601e9ec11bf3a87b741e19346f) (thanks @rom1504)
+* [Switch to trusted publishing via OIDC (#158)](https://github.com/PrismarineJS/prismarine-world/commit/515219a59b7319689d206eadcd897f1f1389bb7c) (thanks @rom1504)
+* [Bump expect from 29.7.0 to 30.1.2 (#156)](https://github.com/PrismarineJS/prismarine-world/commit/17752af927b24d7b09d22c43974aaa34af48b093) (thanks @dependabot[bot])
+* [node 22 (#147)](https://github.com/PrismarineJS/prismarine-world/commit/67836a58eebcc28d13d19f62023756a4e639bc0a) (thanks @rom1504)
+* [fix: The raycast was skipping the block that the client is inside. (#145)](https://github.com/PrismarineJS/prismarine-world/commit/63b6489c12a35abc9abf466c6644f51cef136a32) (thanks @zardoy)
+* [Bump mocha from 10.8.2 to 11.0.1 (#146)](https://github.com/PrismarineJS/prismarine-world/commit/1d588910d7241821d357c326bfa951cbd4f604d7) (thanks @dependabot[bot])
+* [Add missing RaycastResult Import (#142)](https://github.com/PrismarineJS/prismarine-world/commit/e46d026985b28f4c3f4cfe825ba15e743958e026) (thanks @Ell1ott)
+
 ### 3.6.3
 
 * Add intersect property to raycast result type [#137](https://github.com/PrismarineJS/prismarine-world/pull/137)
