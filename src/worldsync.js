@@ -208,6 +208,23 @@ class WorldSync extends EventEmitter {
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
+
+  // Sync entity storage methods
+  setEntity (uuid, entityData) {
+    this.async.setEntity(uuid, entityData)
+  }
+
+  getEntity (uuid) {
+    return this.async.getEntity(uuid)
+  }
+
+  removeEntity (uuid) {
+    return this.async.removeEntity(uuid)
+  }
+
+  getAllEntities () {
+    return this.async.getAllEntities()
+  }
 }
 
 module.exports = WorldSync
