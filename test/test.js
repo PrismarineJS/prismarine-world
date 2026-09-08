@@ -70,6 +70,101 @@ describe('saving and loading works', function () {
   })
 })
 
+describe('block entity access', function () {
+  const Vec3 = require('vec3').Vec3
+  const Chunk = require('prismarine-chunk')('1.8')
+
+  function generateChunk () {
+    return new Chunk()
+  }
+
+  it('accesses raw block entities using world coordinates', async () => {
+    const world = new World(generateChunk)
+    const pos = new Vec3(-1, 42, 16)
+    const nbt = { id: 'Chest', Items: [{ Slot: 0, id: 'minecraft:stone', Count: 1 }] }
+
+    await world.setBlockEntity(pos, nbt)
+    assert.strictEqual(await world.getBlockEntity(pos), nbt)
+    assert.strictEqual(world.sync.getBlockEntity(pos), nbt)
+
+    await world.removeBlockEntity(pos)
+    assert.strictEqual(await world.getBlockEntity(pos), undefined)
+  })
+
+  it('does not bypass unloaded-column semantics in the sync view', () => {
+    const world = new World(null)
+    const pos = new Vec3(0, 42, 0)
+    const nbt = { id: 'Chest' }
+
+    assert.strictEqual(world.sync.getBlockEntity(pos), undefined)
+    world.sync.setBlockEntity(pos, nbt)
+    assert.strictEqual(world.sync.getBlockEntity(pos), undefined)
+  })
+
+  it('defensively copies memory-only observations and preserves data values', async () => {
+    const world = new World(generateChunk)
+    const pos = new Vec3(1, 42, 2)
+    const bigIntValue = typeof BigInt === 'function' ? BigInt(3) : 3
+    const protoData = JSON.parse('{"__proto__":{"x":1}}')
+    const observation = {
+      kind: 'chest',
+      slots: [{ type: 1, count: 2, nbt: { value: bigIntValue, protoData }, bytes: Buffer.from([1, 2]), components: new Map([['foo', { value: 4 }]]) }],
+      stale: false,
+      observedAt: 123
+    }
+
+    await world.setObservedBlockInventory(pos, observation)
+    observation.slots[0].count = 99
+    const stored = await world.getObservedBlockInventory(pos)
+    assert.strictEqual(stored.slots[0].count, 2)
+    assert.strictEqual(stored.slots[0].nbt.value, bigIntValue)
+    assert.ok(Object.prototype.hasOwnProperty.call(stored.slots[0].nbt.protoData, '__proto__'))
+    assert.deepStrictEqual(Object.getOwnPropertyDescriptor(stored.slots[0].nbt.protoData, '__proto__').value, { x: 1 })
+    assert.strictEqual(Object.getPrototypeOf(stored.slots[0].nbt.protoData), Object.prototype)
+    assert.deepStrictEqual(Array.from(stored.slots[0].bytes), [1, 2])
+    assert.deepStrictEqual(stored.slots[0].components.get('foo'), { value: 4 })
+    stored.slots[0].count = 100
+    assert.strictEqual((await world.getObservedBlockInventory(pos)).slots[0].count, 2)
+    world.sync.removeObservedBlockInventory(pos)
+    assert.strictEqual(await world.getObservedBlockInventory(pos), null)
+  })
+
+  it('rejects observations without the public snapshot fields', async () => {
+    const world = new World(generateChunk)
+    await assert.rejects(world.setObservedBlockInventory(new Vec3(0, 0, 0), { slots: [] }), /kind, slots, stale, and observedAt/)
+  })
+
+  it('clears observations on block and column invalidation without cross-column leakage', async () => {
+    const world = new World(generateChunk)
+    const first = new Vec3(1, 42, 2)
+    const second = new Vec3(17, 42, 2)
+    const observation = { kind: 'chest', slots: [], stale: false, observedAt: 1 }
+
+    await world.setObservedBlockInventory(first, observation)
+    await world.setObservedBlockInventory(second, observation)
+    world.unloadColumn(0, 0)
+    assert.strictEqual(await world.getObservedBlockInventory(first), null)
+    assert.deepStrictEqual(await world.getObservedBlockInventory(second), observation)
+
+    await world.getColumn(0, 0)
+    world.sync.setObservedBlockInventory(first, observation)
+    world.sync.setBlockType(first, 1)
+    assert.strictEqual(world.sync.getObservedBlockInventory(first), null)
+
+    await world.setObservedBlockInventory(first, observation)
+    world.setLoadedColumn(0, 0, new Chunk(), false)
+    assert.strictEqual(await world.getObservedBlockInventory(first), null)
+
+    await world.setObservedBlockInventory(first, observation)
+    await world.setBlockEntity(first, { id: 'Chest', Items: [] })
+    assert.strictEqual(await world.getObservedBlockInventory(first), null)
+
+    await world.setObservedBlockInventory(first, observation)
+    await world.removeBlockEntity(first)
+    assert.strictEqual(await world.getObservedBlockInventory(first), null)
+  })
+})
+
 describe('Synchronous saving and loading works', function () {
   function generateRandomChunk (chunkX, chunkZ) {
     const chunk = new Chunk()

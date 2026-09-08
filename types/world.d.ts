@@ -9,6 +9,12 @@ export type Chunk = InstanceType<ReturnType<typeof loaderOfChunk>>;
 export type ChunkGenerator = (chunkX: number, chunkZ: number) => Chunk;
 export type ChunkCoordinates = { chunkX: number, chunkZ: number };
 export type ChunkCoordsAndColumn = { chunkX: number, chunkZ: number, column: Chunk };
+export interface BlockInventoryObservation<T = unknown> {
+    kind: string;
+    slots: (T | null)[];
+    stale: boolean;
+    observedAt: number;
+}
 
 export interface StorageProvider {
     load(chunkX: number, chunkZ: number): Promise<Chunk>;
@@ -106,6 +112,18 @@ export declare class World extends EventEmitter {
 
     public getBlock(pos: Vec3): Promise<Block>;
 
+    public getBlockEntity(pos: Vec3): Promise<unknown>;
+
+    public setBlockEntity(pos: Vec3, nbt: unknown): Promise<void>;
+
+    public removeBlockEntity(pos: Vec3): Promise<void>;
+
+    public getObservedBlockInventory<T = unknown>(pos: Vec3): Promise<BlockInventoryObservation<T> | null>;
+
+    public setObservedBlockInventory<T = unknown>(pos: Vec3, observation: BlockInventoryObservation<T>): Promise<void>;
+
+    public removeObservedBlockInventory(pos: Vec3): Promise<void>;
+
     public getBlockStateId(pos: Vec3): Promise<number>;
 
     public getBlockType(pos: Vec3): Promise<number>;
@@ -186,6 +204,18 @@ export declare class WorldSync extends EventEmitter {
     public unloadColumn(chunkX: number, chunkZ: number): void;
 
     public getBlock(pos: Vec3): Block;
+
+    public getBlockEntity(pos: Vec3): unknown;
+
+    public setBlockEntity(pos: Vec3, nbt: unknown): void;
+
+    public removeBlockEntity(pos: Vec3): void;
+
+    public getObservedBlockInventory<T = unknown>(pos: Vec3): BlockInventoryObservation<T> | null;
+
+    public setObservedBlockInventory<T = unknown>(pos: Vec3, observation: BlockInventoryObservation<T>): void;
+
+    public removeObservedBlockInventory(pos: Vec3): void;
 
     public getBlockStateId(pos: Vec3): number;
 

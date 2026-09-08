@@ -87,6 +87,30 @@ Return the column at `chunkX` and `chunkZ`
 
 Get the [Block](https://github.com/PrismarineJS/prismarine-block) at [pos](https://github.com/andrewrk/node-vec3)
 
+### World.getBlockEntity(pos)
+
+Get the raw block-entity data at `pos`. The async world may load the containing column; it returns `undefined` when no block entity exists.
+
+### World.setBlockEntity(pos, nbt)
+
+Set raw block-entity data at `pos` and mark the containing column for saving.
+
+### World.removeBlockEntity(pos)
+
+Remove raw block-entity data at `pos` and mark the containing column for saving.
+
+### World.getObservedBlockInventory(pos)
+
+Get a defensive copy of the memory-only observed inventory snapshot at `pos`, or `null` when absent. The snapshot has `{ kind, slots, stale, observedAt }` fields, is not raw NBT, and is not persisted.
+
+### World.setObservedBlockInventory(pos, observation)
+
+Store a defensive copy of an observed inventory snapshot with `{ kind, slots, stale, observedAt }` fields at `pos`. The snapshot is anchored to that block position and is cleared when the column or block state is invalidated.
+
+### World.removeObservedBlockInventory(pos)
+
+Remove the memory-only observed inventory snapshot at `pos`.
+
 ### World.setBlock(pos,block)
 
 Set the [Block](https://github.com/PrismarineJS/prismarine-block) at [pos](https://github.com/andrewrk/node-vec3)

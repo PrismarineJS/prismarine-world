@@ -12,6 +12,60 @@ function posInChunk (pos) {
   return new Vec3(Math.floor(pos.x) & 15, Math.floor(pos.y), Math.floor(pos.z) & 15)
 }
 
+function observationKey (pos) {
+  return `${Math.floor(pos.x)},${Math.floor(pos.y)},${Math.floor(pos.z)}`
+}
+
+function cloneObservation (value, seen = new Map()) {
+  if (value === null || typeof value !== 'object') return value
+  if (typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) return Buffer.from(value)
+  if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) return value.slice(0)
+  if (typeof DataView !== 'undefined' && value instanceof DataView) {
+    return new DataView(value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength))
+  }
+  if (typeof ArrayBuffer !== 'undefined' && ArrayBuffer.isView(value)) return new value.constructor(value)
+  if (seen.has(value)) throw new TypeError('observation must not contain cycles')
+  seen.set(value, true)
+  if (Array.isArray(value)) {
+    const copy = value.map(item => cloneObservation(item, seen))
+    seen.delete(value)
+    return copy
+  }
+  if (value instanceof Map) {
+    const copy = new Map()
+    for (const [key, item] of value) copy.set(cloneObservation(key, seen), cloneObservation(item, seen))
+    seen.delete(value)
+    return copy
+  }
+  if (value instanceof Set) {
+    const copy = new Set()
+    for (const item of value) copy.add(cloneObservation(item, seen))
+    seen.delete(value)
+    return copy
+  }
+  const prototype = Object.getPrototypeOf(value)
+  if (prototype !== Object.prototype && prototype !== null) throw new TypeError('observation must contain data objects only')
+  const copy = Object.create(prototype)
+  for (const key of Object.keys(value)) {
+    Object.defineProperty(copy, key, {
+      value: cloneObservation(value[key], seen),
+      enumerable: true,
+      configurable: true,
+      writable: true
+    })
+  }
+  seen.delete(value)
+  return copy
+}
+
+function validateObservation (observation) {
+  if (observation === null || typeof observation !== 'object' ||
+    typeof observation.kind !== 'string' || !Array.isArray(observation.slots) ||
+    typeof observation.stale !== 'boolean' || typeof observation.observedAt !== 'number') {
+    throw new TypeError('observation must contain kind, slots, stale, and observedAt')
+  }
+}
+
 class World extends EventEmitter {
   constructor (chunkGenerator, storageProvider = null, savingInterval = 1000) {
     super()
@@ -20,6 +74,7 @@ class World extends EventEmitter {
     this.finishedSaving = Promise.resolve()
     this.currentlySaving = false // semaphore for saving
     this.columns = {}
+    this.observedBlockInventories = new Map()
     this.chunkGenerator = chunkGenerator
     this.storageProvider = storageProvider
     this.savingInterval = savingInterval
@@ -110,6 +165,7 @@ class World extends EventEmitter {
 
   setLoadedColumn (chunkX, chunkZ, chunk, save = true) {
     const key = columnKeyXZ(chunkX, chunkZ)
+    this._clearObservedBlockInventoriesForColumn(chunkX, chunkZ)
     this.columns[key] = chunk
 
     const columnCorner = new Vec3(chunkX * 16, 0, chunkZ * 16)
@@ -124,6 +180,7 @@ class World extends EventEmitter {
   }
 
   unloadColumn (chunkX, chunkZ) {
+    this._clearObservedBlockInventoriesForColumn(chunkX, chunkZ)
     const key = columnKeyXZ(chunkX, chunkZ)
     if (this.storageProvider && this.savingQueue.has(key)) {
       this.unloadQueue.set(key, { chunkX, chunkZ })
@@ -192,6 +249,45 @@ class World extends EventEmitter {
     if (this.storageProvider) { this.queueSaving(chunkX, chunkZ) }
   }
 
+  _clearObservedBlockInventoriesForColumn (chunkX, chunkZ) {
+    const minX = chunkX * 16
+    const minZ = chunkZ * 16
+    for (const key of this.observedBlockInventories.keys()) {
+      const [x, , z] = key.split(',').map(Number)
+      if (x >= minX && x < minX + 16 && z >= minZ && z < minZ + 16) this.observedBlockInventories.delete(key)
+    }
+  }
+
+  _clearObservedBlockInventory (pos) {
+    this.observedBlockInventories.delete(observationKey(pos))
+  }
+
+  async getObservedBlockInventory (pos) {
+    return this._getObservedBlockInventory(pos)
+  }
+
+  async setObservedBlockInventory (pos, observation) {
+    this._setObservedBlockInventory(pos, observation)
+  }
+
+  async removeObservedBlockInventory (pos) {
+    this._removeObservedBlockInventory(pos)
+  }
+
+  _getObservedBlockInventory (pos) {
+    const observation = this.observedBlockInventories.get(observationKey(pos))
+    return observation == null ? null : cloneObservation(observation)
+  }
+
+  _setObservedBlockInventory (pos, observation) {
+    validateObservation(observation)
+    this.observedBlockInventories.set(observationKey(pos), cloneObservation(observation))
+  }
+
+  _removeObservedBlockInventory (pos) {
+    this._clearObservedBlockInventory(pos)
+  }
+
   getColumns () {
     return Object.entries(this.columns).map(([key, column]) => {
       const parts = key.split(',')
@@ -220,6 +316,7 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlock(pInChunk, block)
+    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, block, pos)
   }
@@ -228,6 +325,27 @@ class World extends EventEmitter {
     const block = (await this.getColumnAt(pos)).getBlock(posInChunk(pos))
     block.position = pos.floored()
     return block
+  }
+
+  async getBlockEntity (pos) {
+    const column = await this.getColumnAt(pos)
+    return column && column.getBlockEntity(posInChunk(pos))
+  }
+
+  async setBlockEntity (pos, nbt) {
+    const column = await this.getColumnAt(pos)
+    if (!column) return
+    column.setBlockEntity(posInChunk(pos), nbt)
+    this._clearObservedBlockInventory(pos)
+    this.saveAt(pos)
+  }
+
+  async removeBlockEntity (pos) {
+    const column = await this.getColumnAt(pos)
+    if (!column) return
+    column.removeBlockEntity(posInChunk(pos))
+    this._clearObservedBlockInventory(pos)
+    this.saveAt(pos)
   }
 
   async getBlockStateId (pos) {
@@ -259,6 +377,7 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockStateId(pInChunk, stateId)
+    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -268,6 +387,7 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockType(pInChunk, blockType)
+    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -277,6 +397,7 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockData(pInChunk, data)
+    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
