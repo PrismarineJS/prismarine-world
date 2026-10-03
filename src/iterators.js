@@ -146,10 +146,14 @@ class RaycastIterator {
     let f = BlockFace.UNKNOWN
     const p = this.pos.minus(offset)
     for (const shape of shapes) {
-      let tmin = (shape[this.invDirX > 0 ? 0 : 3] - p.x) * this.invDirX
-      let tmax = (shape[this.invDirX > 0 ? 3 : 0] - p.x) * this.invDirX
-      const tymin = (shape[this.invDirY > 0 ? 1 : 4] - p.y) * this.invDirY
-      const tymax = (shape[this.invDirY > 0 ? 4 : 1] - p.y) * this.invDirY
+      // A parallel ray either misses the slab or stays in it for its whole length.
+      if (this.dir.x === 0 && (p.x < shape[0] || p.x > shape[3])) continue
+      if (this.dir.y === 0 && (p.y < shape[1] || p.y > shape[4])) continue
+      if (this.dir.z === 0 && (p.z < shape[2] || p.z > shape[5])) continue
+      let tmin = this.dir.x === 0 ? -Infinity : (shape[this.invDirX > 0 ? 0 : 3] - p.x) * this.invDirX
+      let tmax = this.dir.x === 0 ? Infinity : (shape[this.invDirX > 0 ? 3 : 0] - p.x) * this.invDirX
+      const tymin = this.dir.y === 0 ? -Infinity : (shape[this.invDirY > 0 ? 1 : 4] - p.y) * this.invDirY
+      const tymax = this.dir.y === 0 ? Infinity : (shape[this.invDirY > 0 ? 4 : 1] - p.y) * this.invDirY
 
       let face = this.stepX > 0 ? BlockFace.WEST : BlockFace.EAST
 
@@ -160,8 +164,8 @@ class RaycastIterator {
       }
       if (tymax < tmax) tmax = tymax
 
-      const tzmin = (shape[this.invDirZ > 0 ? 2 : 5] - p.z) * this.invDirZ
-      const tzmax = (shape[this.invDirZ > 0 ? 5 : 2] - p.z) * this.invDirZ
+      const tzmin = this.dir.z === 0 ? -Infinity : (shape[this.invDirZ > 0 ? 2 : 5] - p.z) * this.invDirZ
+      const tzmax = this.dir.z === 0 ? Infinity : (shape[this.invDirZ > 0 ? 5 : 2] - p.z) * this.invDirZ
 
       if ((tmin > tzmax) || (tzmin > tmax)) continue
       if (tzmin > tmin) {
@@ -175,7 +179,7 @@ class RaycastIterator {
         f = face
       }
     }
-    if (t === Number.MAX_VALUE) return null
+    if (!Number.isFinite(t) || t === Number.MAX_VALUE) return null
     return { pos: this.pos.plus(this.dir.scaled(t)), face: f }
   }
 
