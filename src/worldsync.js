@@ -222,7 +222,6 @@ class WorldSync extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockLight(pInChunk, light)
-    this.async._clearObservedBlockInventory(pos)
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -233,7 +232,6 @@ class WorldSync extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setSkyLight(pInChunk, light)
-    this.async._clearObservedBlockInventory(pos)
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -244,7 +242,6 @@ class WorldSync extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBiome(pInChunk, biome)
-    this.async._clearObservedBlockInventory(pos)
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }

@@ -111,7 +111,7 @@ Store a defensive copy of an observed inventory snapshot owned by the required s
 
 ### World.removeObservedBlockInventory(pos, observer)
 
-Remove only the memory-only snapshot owned by the required `observer` at `pos`. Block, block-state, light, biome, block-entity, column replacement, and column unload mutations invalidate all observers at that position. These changes emit `observedBlockInventoryUpdate` on the world and sync view, with `(position, next, previous)` arguments containing independent defensive copies of the aggregate snapshots; owner updates emit the event even when the aggregate remains unchanged.
+Remove only the memory-only snapshot owned by the required `observer` at `pos`. Block, block-state, block-data, block-entity, column replacement, and column unload mutations invalidate all observers at that position. Lighting and biome changes do not invalidate an inventory observation. These changes emit `observedBlockInventoryUpdate` on the world and sync view, with `(position, next, previous)` arguments containing independent defensive copies of the aggregate snapshots; owner updates emit the event even when the aggregate remains unchanged.
 
 ### World.setBlock(pos,block)
 

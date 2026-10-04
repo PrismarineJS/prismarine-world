@@ -223,6 +223,13 @@ describe('block entity access', function () {
     assert.strictEqual(world.sync.getObservedBlockInventory(first), null)
 
     await world.setObservedBlockInventory(first, observation, 'column-test')
+    await world.setBlockLight(first, 3)
+    assert.deepStrictEqual(await world.getObservedBlockInventory(first), observation)
+    world.sync.setSkyLight(first, 3)
+    assert.deepStrictEqual(world.sync.getObservedBlockInventory(first), observation)
+    world.sync.setBiome(first, 3)
+    assert.deepStrictEqual(world.sync.getObservedBlockInventory(first), observation)
+
     world.setLoadedColumn(0, 0, new Chunk(), false)
     assert.strictEqual(await world.getObservedBlockInventory(first), null)
 

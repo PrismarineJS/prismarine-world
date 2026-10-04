@@ -465,7 +465,6 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockLight(pInChunk, light)
-    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -475,7 +474,6 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setSkyLight(pInChunk, light)
-    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -485,7 +483,6 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBiome(pInChunk, biome)
-    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
