@@ -15,6 +15,7 @@ export interface BlockInventoryObservation<T = unknown> {
     stale: boolean;
     observedAt: number;
 }
+export type BlockInventoryObserver = string | symbol;
 
 export interface StorageProvider {
     load(chunkX: number, chunkZ: number): Promise<Chunk>;
@@ -118,11 +119,11 @@ export declare class World extends EventEmitter {
 
     public removeBlockEntity(pos: Vec3): Promise<void>;
 
-    public getObservedBlockInventory<T = unknown>(pos: Vec3): Promise<BlockInventoryObservation<T> | null>;
+    public getObservedBlockInventory<T = unknown>(pos: Vec3, observer?: BlockInventoryObserver): Promise<BlockInventoryObservation<T> | null>;
 
-    public setObservedBlockInventory<T = unknown>(pos: Vec3, observation: BlockInventoryObservation<T>): Promise<void>;
+    public setObservedBlockInventory<T = unknown>(pos: Vec3, observation: BlockInventoryObservation<T>, observer: BlockInventoryObserver): Promise<void>;
 
-    public removeObservedBlockInventory(pos: Vec3): Promise<void>;
+    public removeObservedBlockInventory(pos: Vec3, observer: BlockInventoryObserver): Promise<void>;
 
     public getBlockStateId(pos: Vec3): Promise<number>;
 
@@ -211,11 +212,11 @@ export declare class WorldSync extends EventEmitter {
 
     public removeBlockEntity(pos: Vec3): void;
 
-    public getObservedBlockInventory<T = unknown>(pos: Vec3): BlockInventoryObservation<T> | null;
+    public getObservedBlockInventory<T = unknown>(pos: Vec3, observer?: BlockInventoryObserver): BlockInventoryObservation<T> | null;
 
-    public setObservedBlockInventory<T = unknown>(pos: Vec3, observation: BlockInventoryObservation<T>): void;
+    public setObservedBlockInventory<T = unknown>(pos: Vec3, observation: BlockInventoryObservation<T>, observer: BlockInventoryObserver): void;
 
-    public removeObservedBlockInventory(pos: Vec3): void;
+    public removeObservedBlockInventory(pos: Vec3, observer: BlockInventoryObserver): void;
 
     public getBlockStateId(pos: Vec3): number;
 

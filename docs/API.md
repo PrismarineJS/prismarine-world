@@ -99,17 +99,19 @@ Set raw block-entity data at `pos` and mark the containing column for saving.
 
 Remove raw block-entity data at `pos` and mark the containing column for saving.
 
-### World.getObservedBlockInventory(pos)
+### World.getObservedBlockInventory(pos, observer)
 
-Get a defensive copy of the memory-only observed inventory snapshot at `pos`, or `null` when absent. The snapshot has `{ kind, slots, stale, observedAt }` fields, is not raw NBT, and is not persisted.
+Get a defensive copy of the memory-only observed inventory snapshot at `pos`, or `null` when absent. Supplying `observer` returns that observer's snapshot. Without it, the world returns the newest non-stale snapshot owned by any observer, falling back to the newest stale snapshot. The snapshot has `{ kind, slots, stale, observedAt }` fields, is not raw NBT, and is not persisted.
 
-### World.setObservedBlockInventory(pos, observation)
+Publication order is tracked internally. A fresh (`stale: false`) publication advances an observer's order. Marking an existing observer stale retains that observer's prior order, so a stale-status update cannot make older contents outrank a newer observation; the first stale publication receives a new order.
 
-Store a defensive copy of an observed inventory snapshot with `{ kind, slots, stale, observedAt }` fields at `pos`. The snapshot is anchored to that block position and is cleared when the column or block state is invalidated.
+### World.setObservedBlockInventory(pos, observation, observer)
 
-### World.removeObservedBlockInventory(pos)
+Store a defensive copy of an observed inventory snapshot owned by the required string or symbol `observer`. Each block position has an independent snapshot per observer. Replacing or marking one observer's snapshot stale does not replace, stale, or remove another observer's snapshot. The API is intentionally scoped to a single block container; callers must treat double chests and other multi-block containers as unknown until they have a reliable topology.
 
-Remove the memory-only observed inventory snapshot at `pos`.
+### World.removeObservedBlockInventory(pos, observer)
+
+Remove only the memory-only snapshot owned by the required `observer` at `pos`. Block, block-state, light, biome, block-entity, column replacement, and column unload mutations invalidate all observers at that position. These changes emit `observedBlockInventoryUpdate` on the world and sync view, with `(position, next, previous)` arguments containing independent defensive copies of the aggregate snapshots; owner updates emit the event even when the aggregate remains unchanged.
 
 ### World.setBlock(pos,block)
 

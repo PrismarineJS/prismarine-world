@@ -16,6 +16,12 @@ function observationKey (pos) {
   return `${Math.floor(pos.x)},${Math.floor(pos.y)},${Math.floor(pos.z)}`
 }
 
+function validateObserver (observer) {
+  if (typeof observer !== 'string' && typeof observer !== 'symbol') {
+    throw new TypeError('observer must be a string or symbol')
+  }
+}
+
 function cloneObservation (value, seen = new Map()) {
   if (value === null || typeof value !== 'object') return value
   if (typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) return Buffer.from(value)
@@ -75,6 +81,7 @@ class World extends EventEmitter {
     this.currentlySaving = false // semaphore for saving
     this.columns = {}
     this.observedBlockInventories = new Map()
+    this.observationSequence = 0
     this.chunkGenerator = chunkGenerator
     this.storageProvider = storageProvider
     this.savingInterval = savingInterval
@@ -252,40 +259,91 @@ class World extends EventEmitter {
   _clearObservedBlockInventoriesForColumn (chunkX, chunkZ) {
     const minX = chunkX * 16
     const minZ = chunkZ * 16
-    for (const key of this.observedBlockInventories.keys()) {
+    for (const key of Array.from(this.observedBlockInventories.keys())) {
       const [x, , z] = key.split(',').map(Number)
-      if (x >= minX && x < minX + 16 && z >= minZ && z < minZ + 16) this.observedBlockInventories.delete(key)
+      if (x >= minX && x < minX + 16 && z >= minZ && z < minZ + 16) {
+        this._clearObservedBlockInventory(new Vec3(x, Number(key.split(',')[1]), z))
+      }
     }
   }
 
+  _emitObservedBlockInventoryUpdate (pos, next, previous) {
+    const emit = emitter => emitter.emit('observedBlockInventoryUpdate', pos.floored(), next == null ? null : cloneObservation(next), previous == null ? null : cloneObservation(previous))
+    emit(this)
+    if (this.sync) emit(this.sync)
+  }
+
+  _getObservedBlockInventoryAggregate (key) {
+    const owners = this.observedBlockInventories.get(key)
+    if (owners == null || owners.size === 0) return null
+    const records = Array.from(owners.values())
+    const fresh = records.filter(record => !record.observation.stale)
+    const candidates = fresh.length === 0 ? records : fresh
+    const latest = candidates.reduce((current, record) => current == null || record.contentSequence > current.contentSequence ? record : current, null)
+    return latest == null ? null : latest.observation
+  }
+
   _clearObservedBlockInventory (pos) {
-    this.observedBlockInventories.delete(observationKey(pos))
+    const key = observationKey(pos)
+    const previous = this._getObservedBlockInventoryAggregate(key)
+    if (previous == null) return
+    this.observedBlockInventories.delete(key)
+    this._emitObservedBlockInventoryUpdate(pos, null, previous)
   }
 
-  async getObservedBlockInventory (pos) {
-    return this._getObservedBlockInventory(pos)
+  async getObservedBlockInventory (pos, observer) {
+    return this._getObservedBlockInventory(pos, observer)
   }
 
-  async setObservedBlockInventory (pos, observation) {
-    this._setObservedBlockInventory(pos, observation)
+  async setObservedBlockInventory (pos, observation, observer) {
+    this._setObservedBlockInventory(pos, observation, observer)
   }
 
-  async removeObservedBlockInventory (pos) {
-    this._removeObservedBlockInventory(pos)
+  async removeObservedBlockInventory (pos, observer) {
+    this._removeObservedBlockInventory(pos, observer)
   }
 
-  _getObservedBlockInventory (pos) {
-    const observation = this.observedBlockInventories.get(observationKey(pos))
-    return observation == null ? null : cloneObservation(observation)
+  _getObservedBlockInventory (pos, observer) {
+    if (observer !== undefined) validateObserver(observer)
+    const owners = this.observedBlockInventories.get(observationKey(pos))
+    if (owners == null) return null
+    if (observer === undefined) {
+      const observation = this._getObservedBlockInventoryAggregate(observationKey(pos))
+      return observation == null ? null : cloneObservation(observation)
+    }
+    const record = owners.get(observer)
+    return record == null ? null : cloneObservation(record.observation)
   }
 
-  _setObservedBlockInventory (pos, observation) {
+  _setObservedBlockInventory (pos, observation, observer) {
     validateObservation(observation)
-    this.observedBlockInventories.set(observationKey(pos), cloneObservation(observation))
+    validateObserver(observer)
+    const key = observationKey(pos)
+    let owners = this.observedBlockInventories.get(key)
+    if (owners == null) {
+      owners = new Map()
+      this.observedBlockInventories.set(key, owners)
+    }
+    const previous = this._getObservedBlockInventoryAggregate(key)
+    const prior = owners.get(observer)
+    const contentSequence = prior != null && observation.stale
+      ? prior.contentSequence
+      : ++this.observationSequence
+    owners.set(observer, { observation: cloneObservation(observation), contentSequence })
+    const next = this._getObservedBlockInventoryAggregate(key)
+    this._emitObservedBlockInventoryUpdate(pos, next, previous)
   }
 
-  _removeObservedBlockInventory (pos) {
-    this._clearObservedBlockInventory(pos)
+  _removeObservedBlockInventory (pos, observer) {
+    validateObserver(observer)
+    const key = observationKey(pos)
+    const owners = this.observedBlockInventories.get(key)
+    if (owners == null || !owners.has(observer)) return
+    const previous = this._getObservedBlockInventoryAggregate(key)
+    owners.delete(observer)
+    if (owners.size === 0) this.observedBlockInventories.delete(key)
+    const next = this._getObservedBlockInventoryAggregate(key)
+    this._emitObservedBlockInventoryUpdate(pos, next, previous)
   }
 
   getColumns () {
@@ -407,6 +465,7 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockLight(pInChunk, light)
+    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -416,6 +475,7 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setSkyLight(pInChunk, light)
+    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -425,6 +485,7 @@ class World extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBiome(pInChunk, biome)
+    this._clearObservedBlockInventory(pos)
     this.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
