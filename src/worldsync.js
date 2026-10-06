@@ -103,6 +103,39 @@ class WorldSync extends EventEmitter {
     return block
   }
 
+  getBlockEntity (pos) {
+    const chunk = this.getColumnAt(pos)
+    return chunk && chunk.getBlockEntity(posInChunk(pos))
+  }
+
+  setBlockEntity (pos, nbt) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.setBlockEntity(posInChunk(pos), nbt)
+    this.async._clearObservedBlockInventory(pos)
+    this.async.saveAt(pos)
+  }
+
+  removeBlockEntity (pos) {
+    const chunk = this.getColumnAt(pos)
+    if (!chunk) return
+    chunk.removeBlockEntity(posInChunk(pos))
+    this.async._clearObservedBlockInventory(pos)
+    this.async.saveAt(pos)
+  }
+
+  getObservedBlockInventory (pos, observer) {
+    return this.async._getObservedBlockInventory(pos, observer)
+  }
+
+  setObservedBlockInventory (pos, observation, observer) {
+    this.async._setObservedBlockInventory(pos, observation, observer)
+  }
+
+  removeObservedBlockInventory (pos, observer) {
+    this.async._removeObservedBlockInventory(pos, observer)
+  }
+
   getBlockStateId (pos) {
     const chunk = this.getColumnAt(pos)
     if (!chunk) return 0
@@ -145,6 +178,7 @@ class WorldSync extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlock(pInChunk, block)
+    this.async._clearObservedBlockInventory(pos)
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, block, pos)
   }
@@ -155,6 +189,7 @@ class WorldSync extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockStateId(pInChunk, stateId)
+    this.async._clearObservedBlockInventory(pos)
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -165,6 +200,7 @@ class WorldSync extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockType(pInChunk, blockType)
+    this.async._clearObservedBlockInventory(pos)
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
@@ -175,6 +211,7 @@ class WorldSync extends EventEmitter {
     const pInChunk = posInChunk(pos)
     const oldBlock = chunk.getBlock(pInChunk)
     chunk.setBlockData(pInChunk, data)
+    this.async._clearObservedBlockInventory(pos)
     this.async.saveAt(pos)
     this._emitBlockUpdate(oldBlock, chunk.getBlock(pInChunk), pos)
   }
